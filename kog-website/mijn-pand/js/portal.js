@@ -26,7 +26,7 @@ function statusPill(status, fallbackKey) {
   const label = meta ? statusLabel(status) : (fallbackKey ? t(fallbackKey) : '—');
   const bg = meta ? meta.bg : '#F1F0EA';
   const fg = meta ? meta.fg : '#6B6862';
-  return `<span class="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold" style="background:${bg};color:${fg}">${label}</span>`;
+  return `<span class="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap" style="background:${bg};color:${fg}">${label}</span>`;
 }
 
 // Latest entry per component (by created_at), from an embedded select.
@@ -228,7 +228,7 @@ export async function renderProperty(root, id) {
     </div>
     ${heroCard(upcoming)}
     <h2 class="mt-9 mb-4 text-[11px] uppercase tracking-[.18em] text-ink/50">${t('portal.components_title')}</h2>
-    <div id="components-grid" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"></div>
+    <div id="components-grid" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
   `;
 
   if (upcoming.length > 1) {
