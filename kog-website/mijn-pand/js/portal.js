@@ -153,7 +153,7 @@ function heroCard(list) {
     : '';
 
   return `
-    <div id="hero-stack" class="relative w-full sm:w-[560px] max-w-full ${total > 1 ? 'cursor-pointer mt-8 mb-9' : 'mt-2 mb-2'}">
+    <div id="hero-stack" class="relative w-full sm:w-[560px] max-w-full ${total > 1 ? 'cursor-pointer mt-14 mb-9' : 'mt-2 mb-2'}">
       ${behindLayers}
       <div class="relative z-20 rounded-2xl p-7 border" style="background:${accent.bg};border-color:${accent.border};${total > 1 ? 'box-shadow:0 14px 30px -16px rgba(26,26,26,.25);' : ''}">
         <div class="text-[11px] uppercase tracking-[.18em] text-ink/45 mb-2">${t('portal.hero.title')}</div>
