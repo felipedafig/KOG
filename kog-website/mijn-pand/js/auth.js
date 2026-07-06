@@ -1,5 +1,6 @@
 import { supabase } from '../../admin/js/supabaseClient.js';
-import { route, startRouter } from '../../admin/js/router.js';
+import { route, startRouter, refresh } from '../../admin/js/router.js';
+import { t, onLangChange } from '../../admin/js/i18n.js';
 import { renderHome, renderProperty, renderComponent } from './portal.js';
 import { renderRapport } from './vve.js';
 
@@ -39,7 +40,7 @@ async function render() {
     if (role !== 'client') {
       try { await supabase.auth.signOut(); } catch { /* still show login below */ }
       const errorBox = document.getElementById('login-error');
-      errorBox.textContent = 'Dit account heeft geen toegang tot Mijn Pand.';
+      errorBox.textContent = t('auth.no_access');
       errorBox.classList.remove('hidden');
       show('login-view');
       return;
@@ -69,7 +70,7 @@ export function initPortal() {
       password: document.getElementById('login-password').value,
     });
     if (error) {
-      errorBox.textContent = 'Inloggen mislukt: controleer uw e-mail en wachtwoord.';
+      errorBox.textContent = t('auth.login_failed');
       errorBox.classList.remove('hidden');
     }
   });
@@ -81,7 +82,7 @@ export function initPortal() {
     const pw = document.getElementById('pw-new').value;
     const confirm = document.getElementById('pw-confirm').value;
     if (pw !== confirm) {
-      errorBox.textContent = 'De wachtwoorden komen niet overeen.';
+      errorBox.textContent = t('auth.pw_mismatch');
       errorBox.classList.remove('hidden');
       return;
     }
@@ -91,8 +92,8 @@ export function initPortal() {
     });
     if (error) {
       errorBox.textContent = error.message.includes('different from the old')
-        ? 'Kies een ander wachtwoord dan uw tijdelijke wachtwoord.'
-        : 'Opslaan mislukt: ' + error.message;
+        ? t('auth.pw_same_as_temp')
+        : t('auth.save_failed', { msg: error.message });
       errorBox.classList.remove('hidden');
       return;
     }
@@ -106,6 +107,10 @@ export function initPortal() {
   route('/property/:id', ({ id }) => renderProperty(root(), id));
   route('/property/:pid/component/:cid', ({ pid, cid }) => renderComponent(root(), pid, cid));
   route('/property/:id/rapport', ({ id }) => renderRapport(root(), id));
+
+  // Re-render the active view (if any) with the new language; harmless no-op
+  // before the router has started (e.g. while still on the login screen).
+  onLangChange(() => { if (started) refresh(); });
 
   // setTimeout defers render() out of the auth callback: awaiting supabase.auth
   // methods inside onAuthStateChange deadlocks against the client's init lock

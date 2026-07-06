@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient.js';
 import { escapeHtml } from './properties.js';
 import { componentTypeLabel } from './components.js';
 import { statusBadge } from './status.js';
+import { t, formatDate } from './i18n.js';
 
 // Module 4: the maintenance calendar. One row per component = its most recent
 // scheduling decision (latest entry among entries that carry a next_inspection_date).
@@ -15,13 +16,13 @@ function dateChip(dateStr, today) {
   let bg = '#F1F0EA', fg = '#6B6862'; // later: neutral
   if (days < 0) { bg = 'rgba(206,27,36,.12)'; fg = '#A3141B'; } // overdue
   else if (days <= 90) { bg = '#FDF3D8'; fg = '#8A6D1D'; } // soon
-  return `<span class="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap" style="background:${bg};color:${fg}">${d.toLocaleDateString('nl-NL')}</span>`;
+  return `<span class="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap" style="background:${bg};color:${fg}">${formatDate(dateStr)}</span>`;
 }
 
 export async function renderAgenda(root) {
   root.innerHTML = `
-    <h1 class="text-[22px] font-semibold mb-1">Agenda</h1>
-    <p class="text-[13.5px] text-ink/55 mb-6">Komende inspecties, op basis van het laatst gelogde werk per bouwdeel.</p>
+    <h1 class="text-[22px] font-semibold mb-1">${t('agenda.title')}</h1>
+    <p class="text-[13.5px] text-ink/55 mb-6">${t('agenda.subtitle')}</p>
     <div id="agenda-list"></div>
   `;
   const list = root.querySelector('#agenda-list');
@@ -30,7 +31,7 @@ export async function renderAgenda(root) {
     .select('id, component_id, status, next_inspection_date, created_at, building_components(id, component_type, label, properties(id, name))')
     .not('next_inspection_date', 'is', null)
     .order('next_inspection_date');
-  if (error) { list.innerHTML = `<p class="text-sienna2">Kon agenda niet laden: ${error.message}</p>`; return; }
+  if (error) { list.innerHTML = `<p class="text-sienna2">${t('agenda.load_error', { msg: error.message })}</p>`; return; }
 
   // Latest scheduling decision per component wins.
   const perComponent = new Map();
@@ -41,15 +42,15 @@ export async function renderAgenda(root) {
   const items = [...perComponent.values()].sort((a, b) => a.next_inspection_date.localeCompare(b.next_inspection_date));
 
   if (!items.length) {
-    list.innerHTML = `<p class="text-ink/50">Nog geen geplande inspecties. Die verschijnen hier zodra werk wordt gelogd met een volgende inspectiedatum.</p>`;
+    list.innerHTML = `<p class="text-ink/50">${t('agenda.empty')}</p>`;
     return;
   }
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const sections = [
-    { title: 'Verlopen', match: d => d < today },
-    { title: 'Komende 3 maanden', match: d => d >= today && d <= new Date(today.getTime() + 90 * DAY) },
-    { title: 'Later', match: d => d > new Date(today.getTime() + 90 * DAY) },
+    { title: t('agenda.section.overdue'), match: d => d < today },
+    { title: t('agenda.section.soon'), match: d => d >= today && d <= new Date(today.getTime() + 90 * DAY) },
+    { title: t('agenda.section.later'), match: d => d > new Date(today.getTime() + 90 * DAY) },
   ];
 
   for (const section of sections) {

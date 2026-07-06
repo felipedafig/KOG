@@ -31,6 +31,26 @@
   }
   .fld input:focus { outline:none; border-color:#CE1B24; box-shadow:0 0 0 3px rgba(206,27,36,.18); }
 
+  /* Language picker (same pattern as the public site) */
+  .kog-lang { position: relative; }
+  .kog-lang__trigger { display:inline-flex; align-items:center; gap:7px; padding:6px 4px; border:0; background:none; cursor:pointer; color:#1A1A1A; font:inherit; }
+  .kog-flag { display:inline-flex; width:26px; height:19px; border:1px solid rgba(26,26,26,.12); overflow:hidden; flex:none; }
+  .kog-flag svg { width:100%; height:100%; display:block; }
+  .kog-lang__caret { width:9px; height:9px; opacity:.55; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+  .kog-lang.open .kog-lang__caret { transform: rotate(180deg); }
+  .kog-lang__menu {
+    position:absolute; top:100%; right:0; margin-top:8px; min-width:150px;
+    background:#FAFAF8; border:1px solid #E5E2DA; padding:6px; border-radius:6px;
+    box-shadow:0 22px 54px -24px rgba(26,26,26,.32);
+    opacity:0; visibility:hidden; transform: translateY(-4px);
+    transition: opacity .2s, transform .2s, visibility .2s; z-index:70; list-style:none;
+  }
+  .kog-lang.open .kog-lang__menu { opacity:1; visibility:visible; transform: translateY(0); }
+  .kog-lang__item { display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; background:none; border:0; cursor:pointer; font:inherit; font-size:13px; color:#1A1A1A; text-align:left; }
+  .kog-lang__item:hover { background:#F1F0EA; color:#CE1B24; }
+  .kog-lang__item[aria-selected="true"] { color:#CE1B24; font-weight:600; }
+  #login-lang-slot, #pwchange-lang-slot { position:absolute; top:20px; right:20px; }
+
   /* Print styles for the VvE bestuursrapport */
   @media print {
     body { background:#fff; font-size:12px; }
@@ -42,29 +62,31 @@
 <body>
 
 <!-- Login -->
-<div id="login-view" class="hidden min-h-screen flex items-center justify-center p-4">
+<div id="login-view" class="hidden min-h-screen flex items-center justify-center p-4 relative">
+  <div id="login-lang-slot"></div>
   <form id="login-form" class="w-full max-w-sm bg-white border border-rule rounded-2xl p-8 shadow-sm">
     <div class="text-[11px] uppercase tracking-[.22em] text-leaf2 mb-2">Kortlevers Onderhoud Groep</div>
-    <h1 class="text-[24px] font-semibold mb-1">Mijn Pand</h1>
-    <p class="text-[13.5px] text-ink/55 mb-6">Uw onderhoudsdossier, altijd inzichtelijk.</p>
-    <label class="fld">E-mail<input id="login-email" type="email" required autocomplete="username" /></label>
-    <label class="fld mt-4">Wachtwoord<input id="login-password" type="password" required autocomplete="current-password" /></label>
+    <h1 class="text-[24px] font-semibold mb-1" data-i18n="login.title">Mijn Pand</h1>
+    <p class="text-[13.5px] text-ink/55 mb-6" data-i18n="login.subtitle">Uw onderhoudsdossier, altijd inzichtelijk.</p>
+    <label class="fld"><span data-i18n="login.email">E-mail</span><input id="login-email" type="email" required autocomplete="username" /></label>
+    <label class="fld mt-4"><span data-i18n="login.password">Wachtwoord</span><input id="login-password" type="password" required autocomplete="current-password" /></label>
     <p id="login-error" class="hidden mt-3 text-[13px] text-sienna2"></p>
-    <button type="submit" class="mt-6 w-full py-3.5 bg-sienna text-white rounded-lg text-[15px] hover:bg-sienna2 transition-colors">Inloggen</button>
-    <p class="mt-5 text-[12.5px] text-ink/45 leading-relaxed">U heeft uw inloggegevens van KOG ontvangen. Wachtwoord vergeten? Neem contact op met KOG via 020 26 000 98.</p>
+    <button type="submit" class="mt-6 w-full py-3.5 bg-sienna text-white rounded-lg text-[15px] hover:bg-sienna2 transition-colors" data-i18n="login.submit">Inloggen</button>
+    <p class="mt-5 text-[12.5px] text-ink/45 leading-relaxed" data-i18n="login.help">U heeft uw inloggegevens van KOG ontvangen. Wachtwoord vergeten? Neem contact op met KOG via 020 26 000 98.</p>
   </form>
 </div>
 
 <!-- Forced password change (first login / after reset) -->
-<div id="pwchange-view" class="hidden min-h-screen flex items-center justify-center p-4">
+<div id="pwchange-view" class="hidden min-h-screen flex items-center justify-center p-4 relative">
+  <div id="pwchange-lang-slot"></div>
   <form id="pwchange-form" class="w-full max-w-sm bg-white border border-rule rounded-2xl p-8 shadow-sm">
     <div class="text-[11px] uppercase tracking-[.22em] text-leaf2 mb-2">Mijn Pand</div>
-    <h1 class="text-[22px] font-semibold mb-1">Kies uw eigen wachtwoord</h1>
-    <p class="text-[13.5px] text-ink/55 mb-6">U bent ingelogd met een tijdelijk wachtwoord. Stel eerst een eigen wachtwoord in (minimaal 8 tekens).</p>
-    <label class="fld">Nieuw wachtwoord<input id="pw-new" type="password" required minlength="8" autocomplete="new-password" /></label>
-    <label class="fld mt-4">Herhaal wachtwoord<input id="pw-confirm" type="password" required minlength="8" autocomplete="new-password" /></label>
+    <h1 class="text-[22px] font-semibold mb-1" data-i18n="pwchange.title">Kies uw eigen wachtwoord</h1>
+    <p class="text-[13.5px] text-ink/55 mb-6" data-i18n="pwchange.subtitle">U bent ingelogd met een tijdelijk wachtwoord. Stel eerst een eigen wachtwoord in (minimaal 8 tekens).</p>
+    <label class="fld"><span data-i18n="pwchange.new">Nieuw wachtwoord</span><input id="pw-new" type="password" required minlength="8" autocomplete="new-password" /></label>
+    <label class="fld mt-4"><span data-i18n="pwchange.confirm">Herhaal wachtwoord</span><input id="pw-confirm" type="password" required minlength="8" autocomplete="new-password" /></label>
     <p id="pwchange-error" class="hidden mt-3 text-[13px] text-sienna2"></p>
-    <button type="submit" class="mt-6 w-full py-3.5 bg-sienna text-white rounded-lg text-[15px] hover:bg-sienna2 transition-colors">Opslaan en doorgaan</button>
+    <button type="submit" class="mt-6 w-full py-3.5 bg-sienna text-white rounded-lg text-[15px] hover:bg-sienna2 transition-colors" data-i18n="pwchange.submit">Opslaan en doorgaan</button>
   </form>
 </div>
 
@@ -73,15 +95,18 @@
   <header class="border-b border-rule bg-white no-print">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <div>
-        <span class="text-[12px] font-semibold uppercase tracking-[.2em] text-sienna2">Mijn Pand</span>
+        <span class="text-[12px] font-semibold uppercase tracking-[.2em] text-sienna2" data-i18n="header.brand">Mijn Pand</span>
         <span class="text-[12px] text-ink/40 ml-2">· Kortlevers Onderhoud Groep</span>
       </div>
-      <button id="btn-logout" class="text-[13px] text-ink/50 hover:text-sienna">Uitloggen</button>
+      <div class="flex items-center gap-4">
+        <div id="lang-picker-slot"></div>
+        <button id="btn-logout" class="text-[13px] text-ink/50 hover:text-sienna" data-i18n="nav.logout">Uitloggen</button>
+      </div>
     </div>
   </header>
   <main id="view-root" class="max-w-3xl mx-auto px-5 py-8 w-full flex-1"></main>
   <footer class="no-print border-t border-rule bg-white">
-    <div class="max-w-3xl mx-auto px-5 py-4 text-[12.5px] text-ink/45">
+    <div class="max-w-3xl mx-auto px-5 py-4 text-[12.5px] text-ink/45" data-i18n="footer.contact">
       Vragen over uw onderhoud? Bel 020 26 000 98 of mail info@kogonderhoud.nl
     </div>
   </footer>
@@ -89,6 +114,14 @@
 
 <script type="module">
   import { initPortal } from './js/auth.js';
+  import { applyStaticI18n, mountLangPicker, onLangChange } from '../admin/js/i18n.js';
+
+  applyStaticI18n();
+  mountLangPicker(document.getElementById('login-lang-slot'));
+  mountLangPicker(document.getElementById('pwchange-lang-slot'));
+  mountLangPicker(document.getElementById('lang-picker-slot'));
+  onLangChange(() => applyStaticI18n());
+
   initPortal();
 </script>
 </body>

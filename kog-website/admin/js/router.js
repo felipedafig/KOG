@@ -34,3 +34,9 @@ export function startRouter() {
   window.addEventListener('hashchange', resolve);
   resolve();
 }
+
+// Re-runs the current route's handler without changing the hash. Used after a
+// language switch so the active view re-renders with the new strings.
+export function refresh() {
+  resolve();
+}
