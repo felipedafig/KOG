@@ -8,6 +8,13 @@ import { t, tPlural, formatDate, getLang } from '../../admin/js/i18n.js';
 // (property -> components -> history), status always shown as a color.
 
 const DAY = 24 * 60 * 60 * 1000;
+const STACK_STEP = 11; // px of top/right peek per wallet-stack layer, shared with the calendar's alignment offset
+
+// How far the stack's outermost layer pokes above the front card's own top edge —
+// used both to build the layers and to align the calendar column beside it.
+function stackPeek(total) {
+  return Math.min(Math.max(total - 1, 0), 2) * STACK_STEP;
+}
 
 function propertyTypeLabel(type) {
   return ({ home: t('ptype.home'), business: t('ptype.business'), vve: t('ptype.vve') })[type] || '';
@@ -134,17 +141,15 @@ function heroCard(list) {
   // Each layer behind the front card is offset purely up-and-right (no scale), so it
   // peeks out ONLY along the top and right edges — the left and bottom stay tucked
   // behind the front card for a clean "wallet"/deck look.
-  const layerCount = Math.min(behind.length, 2);
-  const STEP = 11; // px of top/right peek per layer
   const behindLayers = behind.slice(0, 2).map((item, i) => {
     const a = urgencyAccent(item.entry.next_inspection_date, today);
     const depth = i + 1; // 1 = nearest behind layer, 2 = most recessed
-    const off = depth * STEP;
+    const off = depth * STACK_STEP;
     return `<div class="absolute inset-0 rounded-2xl border" style="background:${a.bg};border-color:${a.border};box-shadow:0 6px 16px -10px rgba(26,26,26,.22);transform:translate(${off}px,-${off}px);z-index:${10 - depth};"></div>`;
   }).join('');
 
   // Count badge sits on the outermost layer's top-right corner, pulsing to invite a click.
-  const maxOff = layerCount * STEP;
+  const maxOff = stackPeek(total);
   const badge = total > 1
     ? `<div class="kog-count-badge absolute z-30 flex items-center justify-center text-white text-[13px] font-bold"
             style="top:-${maxOff}px;right:-${maxOff}px;transform:translate(50%,-50%);width:30px;height:30px;border-radius:9999px;background:#CE1B24;border:2px solid #FAFAF8;">
@@ -393,7 +398,7 @@ export async function renderProperty(root, id) {
     </div>
     <div class="flex flex-col lg:flex-row gap-5 lg:items-stretch mt-10 mb-9">
       <div class="relative w-full lg:w-[560px] lg:flex-none pr-10">${heroCard(upcoming)}</div>
-      <div id="week-cal" class="w-full lg:flex-1 min-w-0"></div>
+      <div id="week-cal" class="w-full lg:flex-1 min-w-0 ${stackPeek(upcoming.length) ? `lg:relative lg:top-[-${stackPeek(upcoming.length)}px]` : ''}"></div>
     </div>
     <h2 class="mt-2 mb-4 text-[11px] uppercase tracking-[.18em] text-ink/50">${t('portal.components_title')}</h2>
     <div id="components-grid" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
