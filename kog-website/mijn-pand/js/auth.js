@@ -107,6 +107,9 @@ export function initPortal() {
   route('/property/:pid/component/:cid', ({ pid, cid }) => renderComponent(root(), pid, cid));
   route('/property/:id/rapport', ({ id }) => renderRapport(root(), id));
 
-  supabase.auth.onAuthStateChange(() => render());
+  // setTimeout defers render() out of the auth callback: awaiting supabase.auth
+  // methods inside onAuthStateChange deadlocks against the client's init lock
+  // when a persisted session exists at page load.
+  supabase.auth.onAuthStateChange(() => setTimeout(render, 0));
   render();
 }
