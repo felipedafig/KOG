@@ -99,11 +99,13 @@ export function nextMaintenance(components) {
   return upcomingMaintenanceList(components)[0] || null;
 }
 
+// Backgrounds are OPAQUE (the same tints composited over the paper background), so
+// stacked cards never show the page or each other through them.
 function urgencyAccent(dateStr, today) {
   const days = Math.round((new Date(dateStr) - today) / DAY);
-  if (days < 0) return { bg: 'rgba(206,27,36,.07)', border: 'rgba(206,27,36,.35)', fg: '#A3141B', noteKey: 'portal.hero.overdue_note' };
+  if (days < 0) return { bg: '#F7EAEA', border: 'rgba(206,27,36,.35)', fg: '#A3141B', noteKey: 'portal.hero.overdue_note' };
   if (days <= 90) return { bg: '#FDF3D8', border: '#EAD9A0', fg: '#8A6D1D', noteKey: 'portal.hero.soon_note' };
-  return { bg: 'rgba(95,168,60,.10)', border: 'rgba(95,168,60,.35)', fg: '#4C8B30', noteKey: null };
+  return { bg: '#ECF3E5', border: 'rgba(95,168,60,.35)', fg: '#4C8B30', noteKey: null };
 }
 
 // Renders the hero as a "wallet" of cards: the soonest item on top, up to two more
