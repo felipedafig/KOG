@@ -12,7 +12,7 @@ export async function renderPropertiesList(root) {
       <h1 class="text-[22px] font-semibold">${t('properties.title')}</h1>
       <button id="btn-new-property" class="px-4 py-2.5 bg-sienna text-white rounded text-[13.5px] hover:bg-sienna2">${t('properties.new_btn')}</button>
     </div>
-    <div id="properties-list" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+    <div id="properties-list" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
   `;
   root.querySelector('#btn-new-property').addEventListener('click', () => openPropertyForm());
 
@@ -51,7 +51,7 @@ export async function renderPropertyDetail(root, id) {
       </div>
       <button id="btn-new-component" class="px-4 py-2.5 bg-sienna text-white rounded text-[13.5px] hover:bg-sienna2 whitespace-nowrap">${t('properties.new_component_btn')}</button>
     </div>
-    <div id="components-list" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+    <div id="components-list" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
     <div id="access-section" class="mt-10"></div>
   `;
   root.querySelector('#btn-new-component').addEventListener('click', () => openComponentForm(id));

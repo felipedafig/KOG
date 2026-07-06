@@ -65,7 +65,7 @@ export async function renderHome(root) {
   root.innerHTML = `
     <h1 class="text-[24px] font-semibold mb-1">${t('portal.your_properties')}</h1>
     <p class="text-[14px] text-ink/55 mb-6">${t('portal.choose_property')}</p>
-    <div class="grid gap-4 sm:grid-cols-2"></div>
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"></div>
   `;
   const grid = root.querySelector('.grid');
   properties.forEach(p => {
@@ -141,7 +141,7 @@ export async function renderProperty(root, id) {
     </div>
     ${heroCard(components)}
     <h2 class="mt-9 mb-4 text-[11px] uppercase tracking-[.18em] text-ink/50">${t('portal.components_title')}</h2>
-    <div id="components-grid" class="grid gap-3 sm:grid-cols-2"></div>
+    <div id="components-grid" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"></div>
   `;
 
   const grid = root.querySelector('#components-grid');
