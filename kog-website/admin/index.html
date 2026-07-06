@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOG — Beheer</title>
+<meta name="robots" content="noindex, nofollow" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap; src:url('../assets/fonts/montserrat-400.ttf') format('truetype'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:600; font-display:swap; src:url('../assets/fonts/montserrat-600.ttf') format('truetype'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:700; font-display:swap; src:url('../assets/fonts/montserrat-700.ttf') format('truetype'); }
+</style>
+<script>
+  tailwind.config = {
+    theme: { extend: { colors: {
+      ink:'#1A1A1A', paper:'#FAFAF8', paper2:'#F1F0EA', rule:'#E5E2DA', mute:'#6B6862',
+      sienna:'#CE1B24', sienna2:'#A3141B', leaf:'#5FA83C', leaf2:'#4C8B30',
+    } } }
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<style>
+  body { background:#FAFAF8; color:#1A1A1A; font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif; }
+  .fld { display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#6B6862; margin-bottom:0; }
+  .fld input, .fld select, .fld textarea {
+    display:block; width:100%; margin-top:6px; padding:10px 12px; border:1px solid #E5E2DA; border-radius:4px;
+    font-family:'Montserrat',sans-serif; font-size:14px; color:#1A1A1A; text-transform:none; letter-spacing:normal; background:#fff;
+  }
+  .fld input:focus, .fld select:focus, .fld textarea:focus { outline:none; border-color:#CE1B24; box-shadow:0 0 0 3px rgba(206,27,36,.18); }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:540px) { .form-grid { grid-template-columns:1fr; } }
+  .fld + .fld, .form-grid + .fld { margin-top:14px; }
+  .form-grid .fld { margin-top:0; }
+</style>
+</head>
+<body>
+
+<div id="login-view" class="min-h-screen flex items-center justify-center p-4">
+  <form id="login-form" class="w-full max-w-sm bg-white border border-rule rounded-xl p-8">
+    <div class="text-[11px] uppercase tracking-[.22em] text-leaf2 mb-2">KOG — Beheer</div>
+    <h1 class="text-[22px] font-semibold mb-6">Inloggen</h1>
+    <label class="fld">E-mail<input id="login-email" type="email" required autocomplete="username" /></label>
+    <label class="fld mt-3">Wachtwoord<input id="login-password" type="password" required autocomplete="current-password" /></label>
+    <p id="login-error" class="hidden mt-3 text-[13px] text-sienna2"></p>
+    <button type="submit" class="mt-5 w-full py-3 bg-sienna text-white rounded text-[14px] hover:bg-sienna2">Inloggen</button>
+  </form>
+</div>
+
+<div id="app-view" class="hidden min-h-screen">
+  <header class="border-b border-rule bg-white">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <span class="text-[13px] font-semibold uppercase tracking-[.18em] text-sienna2">KOG Beheer</span>
+        <nav class="flex items-center gap-4 text-[13.5px]">
+          <a href="#/quotes" class="hover:text-sienna">Aanvragen</a>
+          <a href="#/properties" class="hover:text-sienna">Panden</a>
+        </nav>
+      </div>
+      <button id="btn-logout" class="text-[13px] text-ink/50 hover:text-sienna">Uitloggen</button>
+    </div>
+  </header>
+  <main id="view-root" class="max-w-5xl mx-auto px-4 py-8"></main>
+</div>
+
+<script type="module">
+  import { signIn, signOut, guard } from './js/auth.js';
+  import { route, startRouter, navigate } from './js/router.js';
+  import { renderQuotesList, renderQuoteDetail } from './js/quotes.js';
+  import { renderPropertiesList, renderPropertyDetail } from './js/properties.js';
+  import { renderComponentDetail } from './js/entries.js';
+
+  const loginForm = document.getElementById('login-form');
+  loginForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const errorBox = document.getElementById('login-error');
+    errorBox.classList.add('hidden');
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const { error } = await signIn(email, password);
+    if (error) {
+      errorBox.textContent = 'Inloggen mislukt: controleer e-mail en wachtwoord.';
+      errorBox.classList.remove('hidden');
+    }
+  });
+
+  document.getElementById('btn-logout').addEventListener('click', () => signOut());
+
+  const root = document.getElementById('view-root');
+  route('/quotes', () => renderQuotesList(root));
+  route('/quotes/:id', ({ id }) => renderQuoteDetail(root, id));
+  route('/properties', () => renderPropertiesList(root));
+  route('/properties/:id', ({ id }) => renderPropertyDetail(root, id));
+  route('/components/:id', ({ id }) => renderComponentDetail(root, id));
+
+  guard(() => {
+    if (!location.hash || location.hash === '#/') navigate('/quotes');
+    startRouter();
+  });
+</script>
+</body>
+</html>
