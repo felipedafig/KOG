@@ -1,5 +1,6 @@
 // Single source of truth for "status is a color, not a paragraph" (requirements §4.4).
 // Every view renders a maintenance-entry status through statusBadge(), never ad hoc.
+// Shared with mijn-pand/ (imported cross-folder) — keep free of admin-specific behavior.
 export const STATUS_META = {
   planned:            { label: 'Gepland',            bg: '#F1F0EA', fg: '#6B6862' },
   quoted:             { label: 'Offerte uitgebracht', bg: '#FDF3D8', fg: '#8A6D1D' },

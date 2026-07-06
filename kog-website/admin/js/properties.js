@@ -49,26 +49,32 @@ export async function renderPropertyDetail(root, id) {
       <button id="btn-new-component" class="px-4 py-2.5 bg-sienna text-white rounded text-[13.5px] hover:bg-sienna2 whitespace-nowrap">+ Bouwdeel</button>
     </div>
     <div id="components-list" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+    <div id="access-section" class="mt-10"></div>
   `;
   root.querySelector('#btn-new-component').addEventListener('click', () => openComponentForm(id));
 
   const list = root.querySelector('#components-list');
-  if (!components || !components.length) { list.innerHTML = `<p class="text-ink/50">Nog geen bouwdelen voor dit pand.</p>`; return; }
+  if (!components || !components.length) {
+    list.innerHTML = `<p class="text-ink/50">Nog geen bouwdelen voor dit pand.</p>`;
+  } else {
+    const { componentTypeLabel } = await import('./components.js');
+    const { STATUS_META } = await import('./status.js');
+    components.forEach(c => {
+      const latest = (c.maintenance_entries || []).slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+      const meta = latest ? (STATUS_META[latest.status] || null) : null;
+      const card = document.createElement('a');
+      card.href = `#/components/${c.id}`;
+      card.className = 'block p-4 border border-rule rounded-lg hover:border-sienna transition-colors bg-white';
+      card.innerHTML = `
+        <div class="text-[15px] font-semibold">${escapeHtml(componentTypeLabel(c.component_type))}${c.label ? ' — ' + escapeHtml(c.label) : ''}</div>
+        <div class="mt-2 inline-flex text-[11px] uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:${meta ? meta.bg : '#F1F0EA'};color:${meta ? meta.fg : '#6B6862'}">${meta ? meta.label : 'Nog geen werk gelogd'}</div>
+      `;
+      list.appendChild(card);
+    });
+  }
 
-  const { componentTypeLabel } = await import('./components.js');
-  const { STATUS_META } = await import('./status.js');
-  components.forEach(c => {
-    const latest = (c.maintenance_entries || []).slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-    const meta = latest ? (STATUS_META[latest.status] || null) : null;
-    const card = document.createElement('a');
-    card.href = `#/components/${c.id}`;
-    card.className = 'block p-4 border border-rule rounded-lg hover:border-sienna transition-colors bg-white';
-    card.innerHTML = `
-      <div class="text-[15px] font-semibold">${escapeHtml(componentTypeLabel(c.component_type))}${c.label ? ' — ' + escapeHtml(c.label) : ''}</div>
-      <div class="mt-2 inline-flex text-[11px] uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:${meta ? meta.bg : '#F1F0EA'};color:${meta ? meta.fg : '#6B6862'}">${meta ? meta.label : 'Nog geen werk gelogd'}</div>
-    `;
-    list.appendChild(card);
-  });
+  const { renderAccessSection } = await import('./access.js');
+  renderAccessSection(root.querySelector('#access-section'), property);
 }
 
 export function openPropertyForm(prefill) {

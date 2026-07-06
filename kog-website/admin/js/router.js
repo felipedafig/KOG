@@ -1,5 +1,6 @@
 // Minimal hash router. Routes are registered as "/quotes", "/properties/:id" etc.
 // The matched handler receives (params) and is responsible for rendering into #view-root.
+// Shared with mijn-pand/ (imported cross-folder) — keep free of admin-specific behavior.
 const routes = [];
 
 export function route(pattern, handler) {

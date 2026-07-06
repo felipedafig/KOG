@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mijn Pand — KOG</title>
+<meta name="robots" content="noindex, nofollow" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap; src:url('../assets/fonts/montserrat-400.ttf') format('truetype'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:600; font-display:swap; src:url('../assets/fonts/montserrat-600.ttf') format('truetype'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:700; font-display:swap; src:url('../assets/fonts/montserrat-700.ttf') format('truetype'); }
+</style>
+<script>
+  tailwind.config = {
+    theme: { extend: { colors: {
+      ink:'#1A1A1A', paper:'#FAFAF8', paper2:'#F1F0EA', rule:'#E5E2DA', mute:'#6B6862',
+      sienna:'#CE1B24', sienna2:'#A3141B', leaf:'#5FA83C', leaf2:'#4C8B30',
+    } } }
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<style>
+  body { background:#FAFAF8; color:#1A1A1A; font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif; font-size:15px; -webkit-font-smoothing:antialiased; }
+  .fld { display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#6B6862; }
+  .fld input {
+    display:block; width:100%; margin-top:6px; padding:12px 14px; border:1px solid #E5E2DA; border-radius:6px;
+    font-family:'Montserrat',sans-serif; font-size:15px; color:#1A1A1A; text-transform:none; letter-spacing:normal; background:#fff;
+  }
+  .fld input:focus { outline:none; border-color:#CE1B24; box-shadow:0 0 0 3px rgba(206,27,36,.18); }
+
+  /* Print styles for the VvE bestuursrapport */
+  @media print {
+    body { background:#fff; font-size:12px; }
+    .no-print { display:none !important; }
+    .rapport-card { break-inside:avoid; border:1px solid #ddd !important; box-shadow:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-view" class="hidden min-h-screen flex items-center justify-center p-4">
+  <form id="login-form" class="w-full max-w-sm bg-white border border-rule rounded-2xl p-8 shadow-sm">
+    <div class="text-[11px] uppercase tracking-[.22em] text-leaf2 mb-2">Kortlevers Onderhoud Groep</div>
+    <h1 class="text-[24px] font-semibold mb-1">Mijn Pand</h1>
+    <p class="text-[13.5px] text-ink/55 mb-6">Uw onderhoudsdossier, altijd inzichtelijk.</p>
+    <label class="fld">E-mail<input id="login-email" type="email" required autocomplete="username" /></label>
+    <label class="fld mt-4">Wachtwoord<input id="login-password" type="password" required autocomplete="current-password" /></label>
+    <p id="login-error" class="hidden mt-3 text-[13px] text-sienna2"></p>
+    <button type="submit" class="mt-6 w-full py-3.5 bg-sienna text-white rounded-lg text-[15px] hover:bg-sienna2 transition-colors">Inloggen</button>
+    <p class="mt-5 text-[12.5px] text-ink/45 leading-relaxed">U heeft uw inloggegevens van KOG ontvangen. Wachtwoord vergeten? Neem contact op met KOG via 020 26 000 98.</p>
+  </form>
+</div>
+
+<!-- Forced password change (first login / after reset) -->
+<div id="pwchange-view" class="hidden min-h-screen flex items-center justify-center p-4">
+  <form id="pwchange-form" class="w-full max-w-sm bg-white border border-rule rounded-2xl p-8 shadow-sm">
+    <div class="text-[11px] uppercase tracking-[.22em] text-leaf2 mb-2">Mijn Pand</div>
+    <h1 class="text-[22px] font-semibold mb-1">Kies uw eigen wachtwoord</h1>
+    <p class="text-[13.5px] text-ink/55 mb-6">U bent ingelogd met een tijdelijk wachtwoord. Stel eerst een eigen wachtwoord in (minimaal 8 tekens).</p>
+    <label class="fld">Nieuw wachtwoord<input id="pw-new" type="password" required minlength="8" autocomplete="new-password" /></label>
+    <label class="fld mt-4">Herhaal wachtwoord<input id="pw-confirm" type="password" required minlength="8" autocomplete="new-password" /></label>
+    <p id="pwchange-error" class="hidden mt-3 text-[13px] text-sienna2"></p>
+    <button type="submit" class="mt-6 w-full py-3.5 bg-sienna text-white rounded-lg text-[15px] hover:bg-sienna2 transition-colors">Opslaan en doorgaan</button>
+  </form>
+</div>
+
+<!-- App -->
+<div id="app-view" class="hidden min-h-screen flex flex-col">
+  <header class="border-b border-rule bg-white no-print">
+    <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
+      <div>
+        <span class="text-[12px] font-semibold uppercase tracking-[.2em] text-sienna2">Mijn Pand</span>
+        <span class="text-[12px] text-ink/40 ml-2">· Kortlevers Onderhoud Groep</span>
+      </div>
+      <button id="btn-logout" class="text-[13px] text-ink/50 hover:text-sienna">Uitloggen</button>
+    </div>
+  </header>
+  <main id="view-root" class="max-w-3xl mx-auto px-5 py-8 w-full flex-1"></main>
+  <footer class="no-print border-t border-rule bg-white">
+    <div class="max-w-3xl mx-auto px-5 py-4 text-[12.5px] text-ink/45">
+      Vragen over uw onderhoud? Bel 020 26 000 98 of mail info@kogonderhoud.nl
+    </div>
+  </footer>
+</div>
+
+<script type="module">
+  import { initPortal } from './js/auth.js';
+  initPortal();
+</script>
+</body>
+</html>

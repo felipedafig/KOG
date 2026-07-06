@@ -57,6 +57,7 @@
         <nav class="flex items-center gap-4 text-[13.5px]">
           <a href="#/quotes" class="hover:text-sienna">Aanvragen</a>
           <a href="#/properties" class="hover:text-sienna">Panden</a>
+          <a href="#/agenda" class="hover:text-sienna">Agenda</a>
         </nav>
       </div>
       <button id="btn-logout" class="text-[13px] text-ink/50 hover:text-sienna">Uitloggen</button>
@@ -71,6 +72,7 @@
   import { renderQuotesList, renderQuoteDetail } from './js/quotes.js';
   import { renderPropertiesList, renderPropertyDetail } from './js/properties.js';
   import { renderComponentDetail } from './js/entries.js';
+  import { renderAgenda } from './js/agenda.js';
 
   const loginForm = document.getElementById('login-form');
   loginForm.addEventListener('submit', async e => {
@@ -94,6 +96,7 @@
   route('/properties', () => renderPropertiesList(root));
   route('/properties/:id', ({ id }) => renderPropertyDetail(root, id));
   route('/components/:id', ({ id }) => renderComponentDetail(root, id));
+  route('/agenda', () => renderAgenda(root));
 
   guard(() => {
     if (!location.hash || location.hash === '#/') navigate('/quotes');

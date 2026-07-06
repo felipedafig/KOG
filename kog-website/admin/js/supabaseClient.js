@@ -1,5 +1,7 @@
-// Public anon key — safe to expose client-side, RLS restricts anon to insert-only
-// on quote_requests/quote_photos; everything else requires an authenticated (staff) session.
+// Public anon key — safe to expose client-side. RLS restricts anon to insert-only on
+// quote_requests/quote_photos; staff (app_metadata.user_role='staff') get full CRUD;
+// clients get read-only access scoped to their linked properties via property_users.
+// Shared with mijn-pand/ (imported cross-folder).
 export const supabase = window.supabase.createClient(
   'https://zhiifaeqwrowmjqemgnl.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoaWlmYWVxd3Jvd21qcWVtZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTM4MzMsImV4cCI6MjA5ODg2OTgzM30.Fc34SeXpKu225su2j8ZFKO8VoNGeWcNv8oiXhh6Q0hI'
