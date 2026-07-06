@@ -17,29 +17,45 @@ function show(id) {
 }
 
 let started = false;
+let triedRefresh = false;
 
 async function render() {
-  const { data: { session } } = await supabase.auth.getSession();
+  try {
+    let { data: { session } } = await supabase.auth.getSession();
 
-  if (!session) { show('login-view'); return; }
+    if (!session) { show('login-view'); return; }
 
-  const role = session.user?.app_metadata?.user_role;
-  if (role === 'staff') { location.replace('../admin/'); return; }
-  if (role !== 'client') {
-    await supabase.auth.signOut();
-    const errorBox = document.getElementById('login-error');
-    errorBox.textContent = 'Dit account heeft geen toegang tot Mijn Pand.';
-    errorBox.classList.remove('hidden');
+    let role = session.user?.app_metadata?.user_role;
+    if (!role && !triedRefresh) {
+      // Token minted before the role system existed — one refresh picks up the claim.
+      triedRefresh = true;
+      const { data } = await supabase.auth.refreshSession();
+      session = data?.session;
+      role = session?.user?.app_metadata?.user_role;
+      if (!session) { show('login-view'); return; }
+    }
+
+    if (role === 'staff') { location.replace('../admin/'); return; }
+    if (role !== 'client') {
+      try { await supabase.auth.signOut(); } catch { /* still show login below */ }
+      const errorBox = document.getElementById('login-error');
+      errorBox.textContent = 'Dit account heeft geen toegang tot Mijn Pand.';
+      errorBox.classList.remove('hidden');
+      show('login-view');
+      return;
+    }
+
+    if (session.user?.user_metadata?.must_change_password) { show('pwchange-view'); return; }
+
+    show('app-view');
+    if (!started) {
+      started = true;
+      startRouter();
+    }
+  } catch (err) {
+    // Whatever happens, never leave the page blank.
+    console.error('Portal render failed:', err);
     show('login-view');
-    return;
-  }
-
-  if (session.user?.user_metadata?.must_change_password) { show('pwchange-view'); return; }
-
-  show('app-view');
-  if (!started) {
-    started = true;
-    startRouter();
   }
 }
 

@@ -19,13 +19,20 @@ export async function signOut() {
 // Non-staff sessions (client portal accounts) are refused with a clear message and
 // signed out; RLS is the real boundary, this just prevents an empty, confusing admin.
 let refusedMessage = null;
+let triedRefresh = false;
 
 export function guard(onReady) {
   const loginView = document.getElementById('login-view');
   const appView = document.getElementById('app-view');
 
   async function render() {
-    const session = await getSession();
+    let session = await getSession();
+    if (session && !session.user?.app_metadata?.user_role && !triedRefresh) {
+      // Token minted before the role system existed — one refresh picks up the claim.
+      triedRefresh = true;
+      const { data } = await supabase.auth.refreshSession();
+      session = data?.session;
+    }
     if (session && session.user?.app_metadata?.user_role !== 'staff') {
       refusedMessage = 'Dit account heeft geen toegang tot KOG Beheer. Ga naar Mijn Pand om uw pand te bekijken.';
       await signOut(); // triggers onAuthStateChange -> render() again, message survives via the module flag
