@@ -259,7 +259,7 @@ function mountWeekCalendar(container, events, today) {
         ? `<span class="mt-1 w-1.5 h-1.5 rounded-full" style="background:${dayEvents[0].accent.fg}"></span>`
         : `<span class="mt-1 w-1.5 h-1.5"></span>`;
       return `
-        <div class="flex flex-col items-center flex-1 py-1.5 rounded-lg ${isToday ? 'bg-paper2' : ''}">
+        <div class="flex flex-col items-center flex-1 py-1 rounded-lg ${isToday ? 'bg-paper2' : ''}">
           <div class="text-[10px] uppercase tracking-wide text-ink/40">${weekdayShort(day)}</div>
           <div class="mt-0.5 text-[14px] ${isToday ? 'font-bold text-sienna' : 'text-ink/80'}">${day.getDate()}</div>
           ${dot}
@@ -267,8 +267,8 @@ function mountWeekCalendar(container, events, today) {
     }).join('');
 
     container.innerHTML = `
-      <div class="h-full flex flex-col bg-white border border-rule rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-3">
+      <div class="h-full flex flex-col bg-white border border-rule rounded-2xl p-4">
+        <div class="flex items-center justify-between mb-2.5">
           <div class="flex items-center gap-1.5">
             <button data-prev aria-label="&lt;" class="w-7 h-7 rounded-full hover:bg-paper2 flex items-center justify-center text-ink/50 text-[16px] leading-none">&lsaquo;</button>
             <span class="text-[13px] font-semibold capitalize">${monthYear(weekStart)}</span>
@@ -277,9 +277,9 @@ function mountWeekCalendar(container, events, today) {
           <button data-full class="text-[12.5px] text-sienna hover:text-sienna2 whitespace-nowrap">${t('cal.full_button')}</button>
         </div>
         <div class="flex gap-1">${dayCells}</div>
-        <div class="mt-auto pt-4">
+        <div class="mt-auto pt-3">
           ${next ? `
-            <button data-jump class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-left hover:shadow-sm transition-all" style="border-color:${next.accent.border};background:${next.accent.bg}">
+            <button data-jump class="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border text-left hover:shadow-sm transition-all" style="border-color:${next.accent.border};background:${next.accent.bg}">
               <div class="min-w-0">
                 <div class="text-[10px] uppercase tracking-[.14em] text-ink/45">${t('cal.next')}</div>
                 <div class="text-[15px] font-semibold truncate" style="color:${next.accent.fg}">${fmtDate(next.dateStr)}</div>
