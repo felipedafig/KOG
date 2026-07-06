@@ -31,6 +31,22 @@
   }
   .fld input:focus { outline:none; border-color:#CE1B24; box-shadow:0 0 0 3px rgba(206,27,36,.18); }
 
+  /* "Next maintenance" wallet-stack count badge — pulsing ring + gentle blink */
+  .kog-count-badge { animation: kog-badge-pulse 2s ease-out infinite; }
+  .kog-count-badge span { animation: kog-badge-blink 2s ease-in-out infinite; }
+  @keyframes kog-badge-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(206,27,36,.5); }
+    70%  { box-shadow: 0 0 0 9px rgba(206,27,36,0); }
+    100% { box-shadow: 0 0 0 0 rgba(206,27,36,0); }
+  }
+  @keyframes kog-badge-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .55; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kog-count-badge, .kog-count-badge span { animation: none; }
+  }
+
   /* Language picker (same pattern as the public site) */
   .kog-lang { position: relative; }
   .kog-lang__trigger { display:inline-flex; align-items:center; gap:7px; padding:6px 4px; border:0; background:none; cursor:pointer; color:#1A1A1A; font:inherit; }

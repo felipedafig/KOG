@@ -83,44 +83,128 @@ export async function renderHome(root) {
 
 /* ---------- property overview: hero "next maintenance" + component cards ---------- */
 
-export function nextMaintenance(components) {
-  // Nearest upcoming/overdue next_inspection_date across each component's latest dated entry.
-  let best = null;
+// Every component's latest dated entry, soonest-first. The hero shows the front one;
+// the rest render as receding "wallet" layers behind it and populate the "see all" modal.
+export function upcomingMaintenanceList(components) {
+  const items = [];
   for (const c of components) {
     const latestDated = (c.maintenance_entries || []).filter(e => e.next_inspection_date).slice()
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-    if (!latestDated) continue;
-    if (!best || latestDated.next_inspection_date < best.entry.next_inspection_date) {
-      best = { component: c, entry: latestDated };
-    }
+    if (latestDated) items.push({ component: c, entry: latestDated });
   }
-  return best;
+  return items.sort((a, b) => a.entry.next_inspection_date.localeCompare(b.entry.next_inspection_date));
 }
 
-function heroCard(components) {
-  const next = nextMaintenance(components);
-  if (!next) {
+export function nextMaintenance(components) {
+  return upcomingMaintenanceList(components)[0] || null;
+}
+
+function urgencyAccent(dateStr, today) {
+  const days = Math.round((new Date(dateStr) - today) / DAY);
+  if (days < 0) return { bg: 'rgba(206,27,36,.07)', border: 'rgba(206,27,36,.35)', fg: '#A3141B', noteKey: 'portal.hero.overdue_note' };
+  if (days <= 90) return { bg: '#FDF3D8', border: '#EAD9A0', fg: '#8A6D1D', noteKey: 'portal.hero.soon_note' };
+  return { bg: 'rgba(95,168,60,.10)', border: 'rgba(95,168,60,.35)', fg: '#4C8B30', noteKey: null };
+}
+
+// Renders the hero as a "wallet" of cards: the soonest item on top, up to two more
+// peeking out behind it (scaled down, offset down-right), and a count badge. Clicking
+// the stack opens a modal listing every upcoming item. Collapses to a single plain
+// card (no stack, no badge, not clickable) when there is nothing — or only one thing —
+// to show behind it.
+function heroCard(list) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  if (!list.length) {
     return `
-      <div class="rounded-2xl p-7 border border-rule bg-white">
+      <div class="rounded-2xl p-7 border border-rule bg-white w-full sm:w-[560px] max-w-full">
         <div class="text-[11px] uppercase tracking-[.18em] text-ink/45 mb-2">${t('portal.hero.title')}</div>
         <div class="text-[19px] font-semibold" style="color:#4C8B30;">${t('portal.hero.none_title')}</div>
         <p class="mt-1.5 text-[13.5px] text-ink/55">${t('portal.hero.none_body')}</p>
       </div>`;
   }
-  const d = new Date(next.entry.next_inspection_date);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const days = Math.round((d - today) / DAY);
-  let accentBg = 'rgba(95,168,60,.10)', accentBorder = 'rgba(95,168,60,.35)', accentFg = '#4C8B30', note = '';
-  if (days < 0) { accentBg = 'rgba(206,27,36,.07)'; accentBorder = 'rgba(206,27,36,.35)'; accentFg = '#A3141B'; note = t('portal.hero.overdue_note'); }
-  else if (days <= 90) { accentBg = '#FDF3D8'; accentBorder = '#EAD9A0'; accentFg = '#8A6D1D'; note = t('portal.hero.soon_note'); }
+
+  const front = list[0];
+  const behind = list.slice(1);
+  const total = list.length;
+  const accent = urgencyAccent(front.entry.next_inspection_date, today);
+  const note = accent.noteKey ? t(accent.noteKey) : '';
+
+  // Each layer behind the front card is offset purely up-and-right (no scale), so it
+  // peeks out ONLY along the top and right edges — the left and bottom stay tucked
+  // behind the front card for a clean "wallet"/deck look.
+  const layerCount = Math.min(behind.length, 2);
+  const STEP = 11; // px of top/right peek per layer
+  const behindLayers = behind.slice(0, 2).map((item, i) => {
+    const a = urgencyAccent(item.entry.next_inspection_date, today);
+    const depth = i + 1; // 1 = nearest behind layer, 2 = most recessed
+    const off = depth * STEP;
+    return `<div class="absolute inset-0 rounded-2xl border" style="background:${a.bg};border-color:${a.border};box-shadow:0 6px 16px -10px rgba(26,26,26,.22);transform:translate(${off}px,-${off}px);z-index:${10 - depth};"></div>`;
+  }).join('');
+
+  // Count badge sits on the outermost layer's top-right corner, pulsing to invite a click.
+  const maxOff = layerCount * STEP;
+  const badge = total > 1
+    ? `<div class="kog-count-badge absolute z-30 flex items-center justify-center text-white text-[13px] font-bold"
+            style="top:-${maxOff}px;right:-${maxOff}px;transform:translate(50%,-50%);width:30px;height:30px;border-radius:9999px;background:#CE1B24;border:2px solid #FAFAF8;">
+         <span>${total}</span>
+       </div>`
+    : '';
+
   return `
-    <div class="rounded-2xl p-7 border" style="background:${accentBg};border-color:${accentBorder};">
-      <div class="text-[11px] uppercase tracking-[.18em] text-ink/45 mb-2">${t('portal.hero.title')}</div>
-      <div class="text-[24px] font-semibold" style="color:${accentFg};">${fmtDate(d)}</div>
-      <div class="mt-1 text-[14.5px]">${escapeHtml(componentTypeLabel(next.component.component_type))}${next.component.label ? ' — ' + escapeHtml(next.component.label) : ''}</div>
-      ${next.entry.next_maintenance_advice ? `<p class="mt-2 text-[13.5px] text-ink/60">${escapeHtml(next.entry.next_maintenance_advice)}</p>` : ''}
-      ${note ? `<p class="mt-2 text-[12.5px] text-ink/50">${note}</p>` : ''}
+    <div id="hero-stack" class="relative w-full sm:w-[560px] max-w-full ${total > 1 ? 'cursor-pointer mb-9' : 'mb-2'}">
+      ${behindLayers}
+      <div class="relative z-20 rounded-2xl p-7 border" style="background:${accent.bg};border-color:${accent.border};${total > 1 ? 'box-shadow:0 14px 30px -16px rgba(26,26,26,.25);' : ''}">
+        <div class="text-[11px] uppercase tracking-[.18em] text-ink/45 mb-2">${t('portal.hero.title')}</div>
+        <div class="text-[24px] font-semibold" style="color:${accent.fg};">${fmtDate(front.entry.next_inspection_date)}</div>
+        <div class="mt-1 text-[14.5px]">${escapeHtml(componentTypeLabel(front.component.component_type))}${front.component.label ? ' — ' + escapeHtml(front.component.label) : ''}</div>
+        ${front.entry.next_maintenance_advice ? `<p class="mt-2 text-[13.5px] text-ink/60">${escapeHtml(front.entry.next_maintenance_advice)}</p>` : ''}
+        ${note ? `<p class="mt-2 text-[12.5px] text-ink/50">${note}</p>` : ''}
+      </div>
+      ${badge}
     </div>`;
+}
+
+// "See all" popup — every upcoming item rendered as its own compact card, soonest first.
+function openUpcomingModal(list) {
+  document.getElementById('upcoming-modal')?.remove();
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  const modal = document.createElement('div');
+  modal.id = 'upcoming-modal';
+  modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="absolute inset-0 bg-black/50" data-close></div>
+    <div class="relative bg-paper rounded-2xl max-w-lg w-full max-h-[85vh] overflow-auto p-6 shadow-xl">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-[18px] font-semibold">${t('portal.upcoming.title')}</h2>
+        <button data-close class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-paper2" aria-label="${t('common.close')}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+        </button>
+      </div>
+      <div id="upcoming-modal-list" class="space-y-3"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const close = () => { modal.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', close));
+  document.addEventListener('keydown', onKey);
+
+  const listBox = modal.querySelector('#upcoming-modal-list');
+  list.forEach(({ component, entry }) => {
+    const a = urgencyAccent(entry.next_inspection_date, today);
+    const item = document.createElement('div');
+    item.className = 'rounded-xl p-4 border';
+    item.style.background = a.bg;
+    item.style.borderColor = a.border;
+    item.innerHTML = `
+      <div class="text-[16px] font-semibold" style="color:${a.fg}">${fmtDate(entry.next_inspection_date)}</div>
+      <div class="mt-0.5 text-[13.5px]">${escapeHtml(componentTypeLabel(component.component_type))}${component.label ? ' — ' + escapeHtml(component.label) : ''}</div>
+      ${entry.next_maintenance_advice ? `<p class="mt-1.5 text-[12.5px] text-ink/60">${escapeHtml(entry.next_maintenance_advice)}</p>` : ''}
+    `;
+    listBox.appendChild(item);
+  });
 }
 
 export async function renderProperty(root, id) {
@@ -129,6 +213,7 @@ export async function renderProperty(root, id) {
   if (!property) { root.innerHTML = `<p class="text-sienna2">${t('portal.property_not_found')}</p>`; return; }
 
   const isVve = property.type === 'vve';
+  const upcoming = upcomingMaintenanceList(components);
   root.innerHTML = `
     <div class="mb-7">
       <div class="text-[11px] uppercase tracking-[.18em] text-leaf2 mb-2">${propertyTypeLabel(property.type)}</div>
@@ -139,10 +224,14 @@ export async function renderProperty(root, id) {
         ${t('portal.rapport_btn')}
       </a>` : ''}
     </div>
-    ${heroCard(components)}
+    ${heroCard(upcoming)}
     <h2 class="mt-9 mb-4 text-[11px] uppercase tracking-[.18em] text-ink/50">${t('portal.components_title')}</h2>
     <div id="components-grid" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"></div>
   `;
+
+  if (upcoming.length > 1) {
+    root.querySelector('#hero-stack')?.addEventListener('click', () => openUpcomingModal(upcoming));
+  }
 
   const grid = root.querySelector('#components-grid');
   if (!components.length) {
