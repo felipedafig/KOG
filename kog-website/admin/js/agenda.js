@@ -3,6 +3,7 @@ import { escapeHtml } from './properties.js';
 import { componentTypeLabel } from './components.js';
 import { statusBadge } from './status.js';
 import { t, formatDate } from './i18n.js';
+import { urgencyAccent, parseYmd, mountWeekCalendar } from './calendar.js';
 
 // Module 4: the maintenance calendar. One row per component = its most recent
 // scheduling decision (latest entry among entries that carry a next_inspection_date).
@@ -23,6 +24,7 @@ export async function renderAgenda(root) {
   root.innerHTML = `
     <h1 class="text-[22px] font-semibold mb-1">${t('agenda.title')}</h1>
     <p class="text-[13.5px] text-ink/55 mb-6">${t('agenda.subtitle')}</p>
+    <div id="agenda-week" class="max-w-3xl mb-8"></div>
     <div id="agenda-list"></div>
   `;
   const list = root.querySelector('#agenda-list');
@@ -42,11 +44,24 @@ export async function renderAgenda(root) {
   const items = [...perComponent.values()].sort((a, b) => a.next_inspection_date.localeCompare(b.next_inspection_date));
 
   if (!items.length) {
+    root.querySelector('#agenda-week').remove();
     list.innerHTML = `<p class="text-ink/50">${t('agenda.empty')}</p>`;
     return;
   }
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  // Same week-strip + month-modal calendar as the client portal, but across ALL
+  // properties: line1 = property, line2 = component, links to the admin component view.
+  const events = items.map(e => ({
+    dateStr: e.next_inspection_date,
+    date: parseYmd(e.next_inspection_date),
+    accent: urgencyAccent(e.next_inspection_date, today),
+    line1: e.building_components.properties.name,
+    line2: componentTypeLabel(e.building_components.component_type) + (e.building_components.label ? ' — ' + e.building_components.label : ''),
+    href: `#/components/${e.building_components.id}`,
+  }));
+  mountWeekCalendar(root.querySelector('#agenda-week'), events, today);
   const sections = [
     { title: t('agenda.section.overdue'), match: d => d < today },
     { title: t('agenda.section.soon'), match: d => d >= today && d <= new Date(today.getTime() + 90 * DAY) },
