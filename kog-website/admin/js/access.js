@@ -6,6 +6,29 @@ import { t, formatDate } from './i18n.js';
 // Account creation/reset goes through the create-client-account edge function
 // (service role); revoking is a direct property_users delete (instant, staff RLS).
 
+// supabase.functions.invoke returns data=null plus a generic FunctionsHttpError
+// ("Edge Function returned a non-2xx status code") for ANY non-2xx response, which
+// hides the function's own error body ({ error: "is_staff_account" } etc.). Recover
+// the body from error.context (the raw Response) and translate the known codes.
+async function invokeAccountFn(body) {
+  // Attach the session token explicitly: the CDN script floats @2 latest, and some
+  // supabase-js versions fall back to the anon key here — the function then rejects
+  // the call as unauthenticated even though the admin is signed in.
+  const { data: { session } } = await supabase.auth.getSession();
+  const { data, error } = await supabase.functions.invoke('create-client-account', {
+    body,
+    headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+  });
+  if (!error) return data;
+  let payload = null;
+  try { payload = await error.context?.json(); } catch { /* body absent or not JSON */ }
+  const code = payload?.error;
+  if (code === 'is_staff_account') throw new Error(t('access.err_staff_email'));
+  if (code === 'forbidden' || code === 'not_staff') throw new Error(t('access.err_forbidden'));
+  if (code === 'auth_failed') throw new Error(t('access.err_auth_failed', { msg: payload?.detail || '' }));
+  throw new Error(code || error.message || t('access.create_failed'));
+}
+
 function tempPasswordModal(password, note) {
   showModal(t('access.temp_pw_title'), `
     <p class="text-[13.5px] text-ink/70">${escapeHtml(note)}</p>
@@ -57,12 +80,14 @@ export async function renderAccessSection(box, property) {
     `;
     row.querySelector('[data-reset]').addEventListener('click', async (e) => {
       e.target.disabled = true;
-      const { data, error: fnError } = await supabase.functions.invoke('create-client-account', {
-        body: { action: 'reset_password', user_id: u.user_id },
-      });
-      e.target.disabled = false;
-      if (fnError || data?.error) { alertError(fnError?.message || data.error); return; }
-      tempPasswordModal(data.temp_password, t('access.temp_pw_reset', { email: u.email }));
+      try {
+        const data = await invokeAccountFn({ action: 'reset_password', user_id: u.user_id });
+        tempPasswordModal(data.temp_password, t('access.temp_pw_reset', { email: u.email }));
+      } catch (err) {
+        alertError(err.message);
+      } finally {
+        e.target.disabled = false;
+      }
     });
     row.querySelector('[data-revoke]').addEventListener('click', () => {
       showModal(t('access.revoke_title'), `
@@ -83,13 +108,7 @@ export async function renderAccessSection(box, property) {
     `, async () => {
       const email = val('f-access-email');
       if (!email) throw new Error(t('access.email_required'));
-      const { data, error: fnError } = await supabase.functions.invoke('create-client-account', {
-        body: { action: 'create', property_id: property.id, email },
-      });
-      if (fnError) throw new Error(fnError.message || t('access.create_failed'));
-      if (data?.error === 'is_staff_account') throw new Error(t('access.err_staff_email'));
-      if (data?.error) throw new Error(data.error);
-      return data;
+      return invokeAccountFn({ action: 'create', property_id: property.id, email });
     }, (result) => {
       if (result.status === 'created') {
         tempPasswordModal(result.temp_password, t('access.temp_pw_new'));

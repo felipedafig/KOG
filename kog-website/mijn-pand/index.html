@@ -6,7 +6,7 @@
 <title>Mijn Pand — KOG</title>
 <meta name="robots" content="noindex, nofollow" />
 
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="../assets/vendor/tailwind-play.js"></script>
 <style>
   @font-face { font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap; src:url('../assets/fonts/montserrat-400.ttf') format('truetype'); }
   @font-face { font-family:'Montserrat'; font-style:normal; font-weight:600; font-display:swap; src:url('../assets/fonts/montserrat-600.ttf') format('truetype'); }
@@ -20,10 +20,34 @@
     } } }
   }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/vendor/supabase.min.js"></script>
 
 <style>
   body { background:#FAFAF8; color:#1A1A1A; font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif; font-size:15px; -webkit-font-smoothing:antialiased; }
+  summary::-webkit-details-marker { display:none; }
+
+  /* App shell (shared with admin/ — keep these rules in sync with admin/index.html) */
+  .app-shell { --sidebar-width: 15.5rem; }
+  .app-shell[data-chromeless="true"] { --sidebar-width: 0rem; }
+  .app-shell__overlay { opacity:0; pointer-events:none; transition: opacity .18s ease; }
+  .app-shell[data-mobile-open="true"] .app-shell__overlay { opacity:1; pointer-events:auto; }
+  .app-shell[data-mobile-open="true"] .app-shell__sidebar { transform: translateX(0); }
+  .shell-nav-label, .shell-brand-copy, .shell-collapse-copy { transition: opacity .18s ease, transform .18s ease, max-width .18s ease; }
+  /* Collapsed rail is desktop-only; on mobile the drawer always opens full-width. */
+  @media (min-width: 1024px) {
+    .app-shell[data-collapsed="true"] { --sidebar-width: 5.5rem; }
+    .app-shell[data-collapsed="true"] .shell-nav-label,
+    .app-shell[data-collapsed="true"] .shell-brand-copy,
+    .app-shell[data-collapsed="true"] .shell-collapse-copy { opacity:0; max-width:0; transform: translateX(-4px); overflow:hidden; pointer-events:none; }
+    .app-shell[data-collapsed="true"] .shell-nav-link { justify-content:center; gap:0; }
+    .app-shell[data-collapsed="true"] .shell-nav-link .shell-nav-badge { display:none; }
+    .app-shell[data-collapsed="true"] .shell-brand-stack { flex-direction:column; align-items:center; gap:.75rem; }
+    /* Keep the collapsed header exactly as tall as the topbar so the border lines meet. */
+    .app-shell[data-collapsed="true"] [data-shell-collapse] { display:none; }
+    .app-shell[data-collapsed="true"] .shell-brand-meta { display:none; }
+    .app-shell[data-collapsed="true"] .shell-sidebar-footer > div { justify-content:center; }
+  }
+
   .fld { display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#6B6862; }
   .fld input {
     display:block; width:100%; margin-top:6px; padding:12px 14px; border:1px solid #E5E2DA; border-radius:6px;
@@ -71,6 +95,8 @@
   @media print {
     body { background:#fff; font-size:12px; }
     .no-print { display:none !important; }
+    /* The shell sidebar/topbar are .no-print; drop the sidebar grid column too. */
+    .app-shell__body { display:block !important; }
     .rapport-card { break-inside:avoid; border:1px solid #ddd !important; box-shadow:none !important; }
   }
 </style>
@@ -106,27 +132,9 @@
   </form>
 </div>
 
-<!-- App -->
-<div id="app-view" class="hidden min-h-screen flex flex-col">
-  <header class="border-b border-rule bg-white no-print">
-    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
-      <div>
-        <span class="text-[12px] font-semibold uppercase tracking-[.2em] text-sienna2" data-i18n="header.brand">Mijn Pand</span>
-        <span class="hidden sm:inline text-[12px] text-ink/40 ml-2">· Kortlevers Onderhoud Groep</span>
-      </div>
-      <div class="flex items-center gap-4">
-        <div id="lang-picker-slot"></div>
-        <button id="btn-logout" class="text-[13px] text-ink/50 hover:text-sienna" data-i18n="nav.logout">Uitloggen</button>
-      </div>
-    </div>
-  </header>
-  <main id="view-root" class="max-w-[1440px] mx-auto px-6 lg:px-10 py-8 w-full flex-1"></main>
-  <footer class="no-print border-t border-rule bg-white">
-    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 py-4 text-[12.5px] text-ink/45" data-i18n="footer.contact">
-      Vragen over uw onderhoud? Bel 020 26 000 98 of mail info@kogonderhoud.nl
-    </div>
-  </footer>
-</div>
+<!-- App: the shared admin app shell (sidebar + top bar) is mounted in here
+     by auth.js once a client session is confirmed. -->
+<div id="app-view" class="hidden min-h-screen"></div>
 
 <script type="module">
   import { initPortal } from './js/auth.js';
@@ -135,7 +143,6 @@
   applyStaticI18n();
   mountLangPicker(document.getElementById('login-lang-slot'));
   mountLangPicker(document.getElementById('pwchange-lang-slot'));
-  mountLangPicker(document.getElementById('lang-picker-slot'));
   onLangChange(() => applyStaticI18n());
 
   initPortal();

@@ -40,15 +40,23 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
-  // Authorize the caller: valid session AND staff role.
-  const userClient = createClient(
+  // Authorize the caller: valid session AND staff role. The token is passed to
+  // getUser() explicitly — the global-Authorization-header shortcut needs a local
+  // session, which never exists in the edge runtime, and silently breaks on some
+  // supabase-js versions. Distinct error codes so the admin UI can say WHY.
+  const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+  const anonClient = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
-    { global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } } },
+    { auth: { persistSession: false } },
   );
-  const { data: { user: caller }, error: callerError } = await userClient.auth.getUser();
-  if (callerError || caller?.app_metadata?.user_role !== "staff") {
-    return json({ error: "forbidden" }, 403);
+  const { data: { user: caller }, error: callerError } = await anonClient.auth.getUser(token);
+  if (callerError) {
+    console.error("caller getUser failed:", callerError.message);
+    return json({ error: "auth_failed", detail: callerError.message }, 403);
+  }
+  if (caller?.app_metadata?.user_role !== "staff") {
+    return json({ error: "not_staff" }, 403);
   }
 
   const admin = createClient(

@@ -6,7 +6,7 @@
 <title>KOG — Beheer</title>
 <meta name="robots" content="noindex, nofollow" />
 
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="../assets/vendor/tailwind-play.js"></script>
 <style>
   @font-face { font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap; src:url('../assets/fonts/montserrat-400.ttf') format('truetype'); }
   @font-face { font-family:'Montserrat'; font-style:normal; font-weight:600; font-display:swap; src:url('../assets/fonts/montserrat-600.ttf') format('truetype'); }
@@ -20,10 +20,31 @@
     } } }
   }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/vendor/supabase.min.js"></script>
 
 <style>
   body { background:#FAFAF8; color:#1A1A1A; font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif; }
+  summary::-webkit-details-marker { display:none; }
+  .app-shell { --sidebar-width: 15.5rem; }
+  .app-shell[data-chromeless="true"] { --sidebar-width: 0rem; }
+  .app-shell__overlay { opacity:0; pointer-events:none; transition: opacity .18s ease; }
+  .app-shell[data-mobile-open="true"] .app-shell__overlay { opacity:1; pointer-events:auto; }
+  .app-shell[data-mobile-open="true"] .app-shell__sidebar { transform: translateX(0); }
+  .shell-nav-label, .shell-brand-copy, .shell-collapse-copy { transition: opacity .18s ease, transform .18s ease, max-width .18s ease; }
+  /* Collapsed rail is desktop-only; on mobile the drawer always opens full-width. */
+  @media (min-width: 1024px) {
+    .app-shell[data-collapsed="true"] { --sidebar-width: 5.5rem; }
+    .app-shell[data-collapsed="true"] .shell-nav-label,
+    .app-shell[data-collapsed="true"] .shell-brand-copy,
+    .app-shell[data-collapsed="true"] .shell-collapse-copy { opacity:0; max-width:0; transform: translateX(-4px); overflow:hidden; pointer-events:none; }
+    .app-shell[data-collapsed="true"] .shell-nav-link { justify-content:center; gap:0; }
+    .app-shell[data-collapsed="true"] .shell-nav-link .shell-nav-badge { display:none; }
+    .app-shell[data-collapsed="true"] .shell-brand-stack { flex-direction:column; align-items:center; gap:.75rem; }
+    /* Keep the collapsed header exactly as tall as the topbar so the border lines meet. */
+    .app-shell[data-collapsed="true"] [data-shell-collapse] { display:none; }
+    .app-shell[data-collapsed="true"] .shell-brand-meta { display:none; }
+    .app-shell[data-collapsed="true"] .shell-sidebar-footer > div { justify-content:center; }
+  }
   .fld { display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#6B6862; margin-bottom:0; }
   .fld input, .fld select, .fld textarea {
     display:block; width:100%; margin-top:6px; padding:10px 12px; border:1px solid #E5E2DA; border-radius:4px;
@@ -59,52 +80,85 @@
 
 <!-- No login form here: all sign-ins go through ../mijn-pand/ (the single front door).
      The guard redirects anyone without a staff session there. -->
-<div id="app-view" class="hidden min-h-screen">
-  <header class="border-b border-rule bg-white">
-    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-6">
-        <span class="text-[13px] font-semibold uppercase tracking-[.18em] text-sienna2" data-i18n="admin.brand">KOG Beheer</span>
-        <nav class="flex items-center gap-4 text-[13.5px]">
-          <a href="#/quotes" class="hover:text-sienna" data-i18n="nav.quotes">Aanvragen</a>
-          <a href="#/properties" class="hover:text-sienna" data-i18n="nav.properties">Panden</a>
-          <a href="#/agenda" class="hover:text-sienna" data-i18n="nav.agenda">Agenda</a>
-        </nav>
-      </div>
-      <div class="flex items-center gap-4">
-        <div id="lang-picker-slot"></div>
-        <button id="btn-logout" class="text-[13px] text-ink/50 hover:text-sienna" data-i18n="nav.logout">Uitloggen</button>
-      </div>
-    </div>
-  </header>
-  <main id="view-root" class="max-w-[1440px] mx-auto px-6 lg:px-10 py-8"></main>
-</div>
+<div id="app-view" class="hidden min-h-screen"></div>
 
 <script type="module">
   import { signOut, guard } from './js/auth.js';
   import { route, startRouter, refresh, navigate } from './js/router.js';
-  import { renderQuotesList, renderQuoteDetail } from './js/quotes.js';
-  import { renderPropertiesList, renderPropertyDetail } from './js/properties.js';
-  import { renderComponentDetail } from './js/entries.js';
-  import { renderAgenda } from './js/agenda.js';
+  import { mountAppShell } from './js/app-shell.js';
   import { applyStaticI18n, mountLangPicker, onLangChange } from './js/i18n.js';
 
-  document.getElementById('btn-logout').addEventListener('click', () => signOut());
+  const routeChunks = new Map();
+  function loadChunk(key) {
+    if (!routeChunks.has(key)) {
+      const loader = {
+        quotes: () => import('./js/quotes.js'),
+        properties: () => import('./js/properties.js'),
+        entries: () => import('./js/entries.js'),
+        agenda: () => import('./js/agenda.js'),
+      }[key];
+      routeChunks.set(key, loader());
+    }
+    return routeChunks.get(key);
+  }
+
+  function prefetchChunk(key) {
+    void loadChunk(key);
+  }
 
   applyStaticI18n();
-  mountLangPicker(document.getElementById('lang-picker-slot'));
-  onLangChange(() => { applyStaticI18n(); refresh(); });
+  let shell = null;
+  let root = null;
 
-  const root = document.getElementById('view-root');
-  route('/quotes', () => renderQuotesList(root));
-  route('/quotes/:id', ({ id }) => renderQuoteDetail(root, id));
-  route('/properties', () => renderPropertiesList(root));
-  route('/properties/:id', ({ id }) => renderPropertyDetail(root, id));
-  route('/components/:id', ({ id }) => renderComponentDetail(root, id));
-  route('/agenda', () => renderAgenda(root));
+  route('/quotes', async () => {
+    const { renderQuotesList } = await loadChunk('quotes');
+    renderQuotesList(root);
+  });
+  route('/quotes/:id', async ({ id }) => {
+    const { renderQuoteDetail } = await loadChunk('quotes');
+    renderQuoteDetail(root, id);
+  });
+  route('/properties', async () => {
+    const { renderPropertiesList } = await loadChunk('properties');
+    renderPropertiesList(root);
+  });
+  route('/properties/:id', async ({ id }) => {
+    const { renderPropertyDetail } = await loadChunk('properties');
+    renderPropertyDetail(root, id);
+  });
+  route('/components/:id', async ({ id }) => {
+    const { renderComponentDetail } = await loadChunk('entries');
+    renderComponentDetail(root, id);
+  });
+  route('/agenda', async () => {
+    const { renderAgenda } = await loadChunk('agenda');
+    renderAgenda(root);
+  });
 
-  guard(() => {
+  guard((session) => {
+    if (shell) {
+      shell.setSession(session);
+      return;
+    }
+    shell = mountAppShell(document.getElementById('app-view'), {
+      session,
+      onLogout: () => signOut(),
+      onPrefetchRoute: prefetchChunk,
+    });
+    root = shell.contentRoot;
+    mountLangPicker(shell.langSlot);
+    // The shell updates its own chrome on kog-langchange; here we only re-run
+    // the static page bits and the active view.
+    onLangChange(() => {
+      applyStaticI18n();
+      refresh();
+    });
     if (!location.hash || location.hash === '#/') navigate('/quotes');
     startRouter();
+    // Idle-prefetch the remaining route chunks so later navigation is instant.
+    const prefetchAll = () => ['quotes', 'properties', 'entries', 'agenda'].forEach(prefetchChunk);
+    if (window.requestIdleCallback) window.requestIdleCallback(prefetchAll);
+    else setTimeout(prefetchAll, 0);
   });
 </script>
 </body>

@@ -34,7 +34,7 @@ function statusPill(status, fallbackKey) {
   const label = meta ? statusLabel(status) : (fallbackKey ? t(fallbackKey) : '—');
   const bg = meta ? meta.bg : '#F1F0EA';
   const fg = meta ? meta.fg : '#6B6862';
-  return `<span class="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap" style="background:${bg};color:${fg}">${label}</span>`;
+  return `<span class="inline-flex shrink-0 items-center px-2.5 py-1 rounded-full text-[11.5px] font-semibold whitespace-nowrap" style="background:${bg};color:${fg}">${label}</span>`;
 }
 
 // Latest entry per component (by created_at), from an embedded select.
@@ -266,8 +266,8 @@ export async function renderProperty(root, id) {
     card.href = `#/property/${id}/component/${c.id}`;
     card.className = 'block bg-white border border-rule rounded-2xl p-5 hover:border-sienna hover:shadow-sm transition-all';
     card.innerHTML = `
-      <div class="flex items-start justify-between gap-3">
-        <div class="text-[15.5px] font-semibold">${escapeHtml(componentTypeLabel(c.component_type))}${c.label ? '<span class="font-normal text-ink/55"> — ' + escapeHtml(c.label) + '</span>' : ''}</div>
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0 text-[15.5px] font-semibold">${escapeHtml(componentTypeLabel(c.component_type))}${c.label ? '<span class="font-normal text-ink/55"> — ' + escapeHtml(c.label) + '</span>' : ''}</div>
         ${statusPill(latest?.status, 'status.none')}
       </div>
       ${nextDate ? `<div class="mt-3 text-[13px] text-ink/55">${t('portal.next_inspection', { date: fmtDate(nextDate) })}</div>` : ''}

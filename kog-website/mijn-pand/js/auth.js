@@ -1,8 +1,29 @@
 import { supabase } from '../../admin/js/supabaseClient.js';
 import { route, startRouter, refresh } from '../../admin/js/router.js';
-import { t, onLangChange } from '../../admin/js/i18n.js';
+import { t, onLangChange, mountLangPicker } from '../../admin/js/i18n.js';
+import { mountAppShell } from '../../admin/js/app-shell.js';
 import { renderHome, renderProperty, renderComponent } from './portal.js';
 import { renderRapport } from './vve.js';
+
+// Same shell as the admin app, dressed for the client portal: one nav item,
+// "Mijn Pand" branding, client role label, and the contact footer.
+const SHELL_CONFIG = {
+  storageKey: 'kog_portal_sidebar_collapsed',
+  brandKey: 'header.brand',
+  subtitleKey: 'shell.portal_subtitle',
+  roleKey: 'shell.role_client',
+  homeHref: '/',
+  footerKey: 'footer.contact',
+  navItems: [
+    { key: 'home', labelKey: 'nav.portal_home', href: '/', exact: false, icon: 'building', roles: ['client'] },
+  ],
+  crumbLabelForPath: path => {
+    if (/^\/property\/[^/]+\/component\//.test(path)) return t('shell.breadcrumb_component');
+    if (/^\/property\/[^/]+\/rapport$/.test(path)) return t('shell.breadcrumb_rapport');
+    if (path.startsWith('/property/')) return t('shell.breadcrumb_detail');
+    return null;
+  },
+};
 
 // Portal guard. Order matters:
 //   no session                       -> login view
@@ -19,6 +40,7 @@ function show(id) {
 
 let started = false;
 let triedRefresh = false;
+let shell = null;
 
 async function render() {
   try {
@@ -49,6 +71,16 @@ async function render() {
     if (session.user?.user_metadata?.must_change_password) { show('pwchange-view'); return; }
 
     show('app-view');
+    if (!shell) {
+      shell = mountAppShell(document.getElementById('app-view'), {
+        session,
+        onLogout: () => supabase.auth.signOut(),
+        config: SHELL_CONFIG,
+      });
+      mountLangPicker(shell.langSlot);
+    } else {
+      shell.setSession(session);
+    }
     if (!started) {
       started = true;
       startRouter();
@@ -100,8 +132,7 @@ export function initPortal() {
     render();
   });
 
-  document.getElementById('btn-logout').addEventListener('click', () => supabase.auth.signOut());
-
+  // Logout lives in the shell's account menu (onLogout above).
   const root = () => document.getElementById('view-root');
   route('/', () => renderHome(root()));
   route('/property/:id', ({ id }) => renderProperty(root(), id));
