@@ -1,0 +1,3 @@
+# Demonstration package with fictional data — not meant to be indexed.
+User-agent: *
+Disallow: /
