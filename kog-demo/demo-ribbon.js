@@ -7,7 +7,11 @@
   const base = inApp ? '../' : './';
   const here = location.pathname.includes('/admin/') ? 'admin'
     : location.pathname.includes('/mijn-pand/') ? 'portal' : 'site';
+  // sessionStorage, deliberately: the welcome popup greets every fresh browser
+  // session (each demo run), but stays away while hopping between the three
+  // views. localStorage would hide it forever after the very first dismissal.
   const SEEN_KEY = 'kog_demo_welcome_seen';
+  const store = () => sessionStorage;
 
   const style = document.createElement('style');
   style.textContent = `
@@ -107,7 +111,7 @@
     document.body.appendChild(overlay);
 
     function dismiss() {
-      try { localStorage.setItem(SEEN_KEY, '1'); } catch { /* private mode */ }
+      try { store().setItem(SEEN_KEY, '1'); } catch { /* private mode */ }
       overlay.remove();
       // Draw the eye to the switcher bar once the popup is gone.
       bar.classList.add('kdr-attention');
@@ -122,10 +126,10 @@
       (trigger?.closest('a, button') || trigger)?.click();
     });
     const link = overlay.querySelector('a.kdw-primary');
-    if (link) link.addEventListener('click', () => { try { localStorage.setItem(SEEN_KEY, '1'); } catch {} });
+    if (link) link.addEventListener('click', () => { try { store().setItem(SEEN_KEY, '1'); } catch {} });
   }
 
   let seen = false;
-  try { seen = !!localStorage.getItem(SEEN_KEY); } catch { /* private mode */ }
+  try { seen = !!store().getItem(SEEN_KEY); } catch { /* private mode */ }
   if (!seen) showWelcome();
 })();
