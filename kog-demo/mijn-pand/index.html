@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mijn Pand — KOG</title>
+<meta name="robots" content="noindex, nofollow" />
+
+<script src="../assets/vendor/tailwind-play.js"></script>
+<style>
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap; src:url('../assets/fonts/montserrat-400.ttf') format('truetype'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:600; font-display:swap; src:url('../assets/fonts/montserrat-600.ttf') format('truetype'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:700; font-display:swap; src:url('../assets/fonts/montserrat-700.ttf') format('truetype'); }
+</style>
+<script>
+  tailwind.config = {
+    theme: { extend: { colors: {
+      ink:'#1A1A1A', paper:'#FAFAF8', paper2:'#F1F0EA', rule:'#E5E2DA', mute:'#6B6862',
+      sienna:'#CE1B24', sienna2:'#A3141B', leaf:'#5FA83C', leaf2:'#4C8B30',
+    } } }
+  }
+</script>
+
+<style>
+  body { background:#FAFAF8; color:#1A1A1A; font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif; font-size:15px; -webkit-font-smoothing:antialiased; }
+  summary::-webkit-details-marker { display:none; }
+
+  /* App shell (shared with admin/ — keep these rules in sync with admin/index.html) */
+  .app-shell { --sidebar-width: 15.5rem; }
+  .app-shell[data-chromeless="true"] { --sidebar-width: 0rem; }
+  .app-shell__overlay { opacity:0; pointer-events:none; transition: opacity .18s ease; }
+  .app-shell[data-mobile-open="true"] .app-shell__overlay { opacity:1; pointer-events:auto; }
+  .app-shell[data-mobile-open="true"] .app-shell__sidebar { transform: translateX(0); }
+  .shell-nav-label, .shell-brand-copy, .shell-collapse-copy { transition: opacity .18s ease, transform .18s ease, max-width .18s ease; }
+  /* Collapsed rail is desktop-only; on mobile the drawer always opens full-width. */
+  @media (min-width: 1024px) {
+    .app-shell[data-collapsed="true"] { --sidebar-width: 5.5rem; }
+    .app-shell[data-collapsed="true"] .shell-nav-label,
+    .app-shell[data-collapsed="true"] .shell-brand-copy,
+    .app-shell[data-collapsed="true"] .shell-collapse-copy { opacity:0; max-width:0; transform: translateX(-4px); overflow:hidden; pointer-events:none; }
+    .app-shell[data-collapsed="true"] .shell-nav-link { justify-content:center; gap:0; }
+    .app-shell[data-collapsed="true"] .shell-nav-link .shell-nav-badge { display:none; }
+    .app-shell[data-collapsed="true"] .shell-brand-stack { flex-direction:column; align-items:center; gap:.75rem; }
+    /* Keep the collapsed header exactly as tall as the topbar so the border lines meet. */
+    .app-shell[data-collapsed="true"] [data-shell-collapse] { display:none; }
+    .app-shell[data-collapsed="true"] .shell-brand-meta { display:none; }
+    .app-shell[data-collapsed="true"] .shell-sidebar-footer > div { justify-content:center; }
+  }
+
+  .fld { display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#6B6862; }
+  .fld input {
+    display:block; width:100%; margin-top:6px; padding:12px 14px; border:1px solid #E5E2DA; border-radius:6px;
+    font-family:'Montserrat',sans-serif; font-size:15px; color:#1A1A1A; text-transform:none; letter-spacing:normal; background:#fff;
+  }
+  .fld input:focus { outline:none; border-color:#CE1B24; box-shadow:0 0 0 3px rgba(206,27,36,.18); }
+
+  /* "Next maintenance" wallet-stack count badge — pulsing ring + gentle blink */
+  .kog-count-badge { animation: kog-badge-pulse 2s ease-out infinite; }
+  .kog-count-badge span { animation: kog-badge-blink 2s ease-in-out infinite; }
+  @keyframes kog-badge-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(206,27,36,.5); }
+    70%  { box-shadow: 0 0 0 9px rgba(206,27,36,0); }
+    100% { box-shadow: 0 0 0 0 rgba(206,27,36,0); }
+  }
+  @keyframes kog-badge-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .55; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kog-count-badge, .kog-count-badge span { animation: none; }
+  }
+
+  /* Language picker (same pattern as the public site) */
+  .kog-lang { position: relative; }
+  .kog-lang__trigger { display:inline-flex; align-items:center; gap:7px; padding:6px 4px; border:0; background:none; cursor:pointer; color:#1A1A1A; font:inherit; }
+  .kog-flag { display:inline-flex; width:26px; height:19px; border:1px solid rgba(26,26,26,.12); overflow:hidden; flex:none; }
+  .kog-flag svg { width:100%; height:100%; display:block; }
+  .kog-lang__caret { width:9px; height:9px; opacity:.55; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+  .kog-lang.open .kog-lang__caret { transform: rotate(180deg); }
+  .kog-lang__menu {
+    position:absolute; top:100%; right:0; margin-top:8px; min-width:150px;
+    background:#FAFAF8; border:1px solid #E5E2DA; padding:6px; border-radius:6px;
+    box-shadow:0 22px 54px -24px rgba(26,26,26,.32);
+    opacity:0; visibility:hidden; transform: translateY(-4px);
+    transition: opacity .2s, transform .2s, visibility .2s; z-index:70; list-style:none;
+  }
+  .kog-lang.open .kog-lang__menu { opacity:1; visibility:visible; transform: translateY(0); }
+  .kog-lang__item { display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; background:none; border:0; cursor:pointer; font:inherit; font-size:13px; color:#1A1A1A; text-align:left; }
+  .kog-lang__item:hover { background:#F1F0EA; color:#CE1B24; }
+  .kog-lang__item[aria-selected="true"] { color:#CE1B24; font-weight:600; }
+  #login-lang-slot, #pwchange-lang-slot { position:absolute; top:20px; right:20px; }
+
+  /* Print styles for the VvE bestuursrapport */
+  @media print {
+    body { background:#fff; font-size:12px; }
+    .no-print { display:none !important; }
+    /* The shell sidebar/topbar are .no-print; drop the sidebar grid column too. */
+    .app-shell__body { display:block !important; }
+    .rapport-card { break-inside:avoid; border:1px solid #ddd !important; box-shadow:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-view" class="hidden min-h-screen flex items-center justify-center p-4 relative">
+  <div id="login-lang-slot"></div>
+  <form id="login-form" class="w-full max-w-sm bg-white border border-rule rounded-2xl p-8 shadow-sm">
+    <div class="text-[11px] uppercase tracking-[.22em] text-leaf2 mb-2">Kortlevers Onderhoud Groep</div>
+    <h1 class="text-[24px] font-semibold mb-1" data-i18n="login.title">Mijn Pand</h1>
+    <p class="text-[13.5px] text-ink/55 mb-6" data-i18n="login.subtitle">Uw onderhoudsdossier, altijd inzichtelijk.</p>
+    <label class="fld"><span data-i18n="login.email">E-mail</span><input id="login-email" type="email" required autocomplete="username" /></label>
+    <label class="fld mt-4"><span data-i18n="login.password">Wachtwoord</span><input id="login-password" type="password" required autocomplete="current-password" /></label>
+    <p id="login-error" class="hidden mt-3 text-[13px] text-sienna2"></p>
+    <button type="submit" class="mt-6 w-full py-3.5 bg-sienna text-white rounded-lg text-[15px] hover:bg-sienna2 transition-colors" data-i18n="login.submit">Inloggen</button>
+    <p class="mt-5 text-[12.5px] text-ink/45 leading-relaxed" data-i18n="login.help">U heeft uw inloggegevens van KOG ontvangen. Wachtwoord vergeten? Neem contact op met KOG via 020 26 000 98.</p>
+  </form>
+</div>
+
+<!-- Forced password change (first login / after reset) -->
+<div id="pwchange-view" class="hidden min-h-screen flex items-center justify-center p-4 relative">
+  <div id="pwchange-lang-slot"></div>
+  <form id="pwchange-form" class="w-full max-w-sm bg-white border border-rule rounded-2xl p-8 shadow-sm">
+    <div class="text-[11px] uppercase tracking-[.22em] text-leaf2 mb-2">Mijn Pand</div>
+    <h1 class="text-[22px] font-semibold mb-1" data-i18n="pwchange.title">Kies uw eigen wachtwoord</h1>
+    <p class="text-[13.5px] text-ink/55 mb-6" data-i18n="pwchange.subtitle">U bent ingelogd met een tijdelijk wachtwoord. Stel eerst een eigen wachtwoord in (minimaal 8 tekens).</p>
+    <label class="fld"><span data-i18n="pwchange.new">Nieuw wachtwoord</span><input id="pw-new" type="password" required minlength="8" autocomplete="new-password" /></label>
+    <label class="fld mt-4"><span data-i18n="pwchange.confirm">Herhaal wachtwoord</span><input id="pw-confirm" type="password" required minlength="8" autocomplete="new-password" /></label>
+    <p id="pwchange-error" class="hidden mt-3 text-[13px] text-sienna2"></p>
+    <button type="submit" class="mt-6 w-full py-3.5 bg-sienna text-white rounded-lg text-[15px] hover:bg-sienna2 transition-colors" data-i18n="pwchange.submit">Opslaan en doorgaan</button>
+  </form>
+</div>
+
+<!-- App: the shared admin app shell (sidebar + top bar) is mounted in here
+     by auth.js once a client session is confirmed. -->
+<div id="app-view" class="hidden min-h-screen"></div>
+
+<script type="module">
+  import { initPortal } from './js/auth.js';
+  import { applyStaticI18n, mountLangPicker, onLangChange } from '../admin/js/i18n.js';
+
+  applyStaticI18n();
+  mountLangPicker(document.getElementById('login-lang-slot'));
+  mountLangPicker(document.getElementById('pwchange-lang-slot'));
+  onLangChange(() => applyStaticI18n());
+
+  initPortal();
+</script>
+<script src="../demo-ribbon.js"></script>
+</body>
+</html>

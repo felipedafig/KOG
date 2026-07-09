@@ -1,0 +1,1541 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOG — Kortlevers Onderhoud Groep · Schilderwerk met geheugen.</title>
+<meta name="description" content="Kortlevers Onderhoud Groep (KOG) — vastgoedzorg & schilderwerk in Noord-Holland. De onderhoudspartner voor VvE's, woningcorporaties en vastgoedbeheerders. Schilderwerk met geheugen." />
+
+<script src="assets/vendor/tailwind-play.js"></script>
+<style>
+  /* Montserrat — self-hosted (same font files as kogonderhoud.nl) */
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap; src:url('assets/fonts/montserrat-400.ttf') format('truetype'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:600; font-display:swap; src:url('assets/fonts/montserrat-600.ttf') format('truetype'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:700; font-display:swap; src:url('assets/fonts/montserrat-700.ttf') format('truetype'); }
+</style>
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink:    '#1A1A1A',
+          paper:  '#FAFAF8',
+          paper2: '#F1F0EA',
+          rule:   '#E5E2DA',
+          mute:   '#6B6862',
+          /* KOG brand — red primary, green accent (from the logo) */
+          sienna: '#CE1B24',   /* KOG red  */
+          sienna2:'#A3141B',   /* KOG red — deep */
+          leaf:   '#5FA83C',   /* KOG green */
+          leaf2:  '#4C8B30',   /* KOG green — deep */
+        },
+        fontFamily: {
+          serif: ['Montserrat', 'ui-serif', 'Georgia', 'serif'],
+          sans:  ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        },
+        letterSpacing: {
+          tightest2: '-0.045em',
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body { background:#FAFAF8; color:#1A1A1A; font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+
+  /* Heading (formerly serif) — now Montserrat, to match kogonderhoud.nl */
+  .font-serif { font-family:'Montserrat',Arial,sans-serif; font-weight:600; letter-spacing:-0.01em; }
+
+  /* Faded photo placeholder (used as onerror fallback) */
+  .ph-stripes {
+    background-image: repeating-linear-gradient(135deg,#EDE9DF 0 14px,#E5DFCF 14px 28px);
+  }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: .08s; }
+  .reveal-delay-2 { transition-delay: .16s; }
+  .reveal-delay-3 { transition-delay: .24s; }
+  .reveal-delay-4 { transition-delay: .32s; }
+  .reveal-delay-5 { transition-delay: .40s; }
+  .reveal-delay-6 { transition-delay: .48s; }
+
+  /* Animated nav underline */
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content:""; position:absolute; left:0; right:0; bottom:-6px; height:1px;
+    background: currentColor; transform: scaleX(0); transform-origin: left center;
+    transition: transform .45s cubic-bezier(.2,.7,.2,1);
+  }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  /* Service card hover lift */
+  .card { transition: transform .5s cubic-bezier(.2,.7,.2,1), box-shadow .5s cubic-bezier(.2,.7,.2,1), border-color .3s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 24px 60px -28px rgba(26,26,26,.18); }
+
+  /* ====== Project stack — pinned dossier cards (Guesty-style) ======
+     Each card is position:sticky; the next card scrolls up over it in
+     normal document flow, so coverage is exactly proportional to scroll.
+     Staggered `top` offsets leave a sliver of each covered card peeking. */
+  .pstack { --pin: 92px; --peek: 14px; --gap: 28px; max-width: 1220px; margin-left: auto; margin-right: auto; }
+  .pcard-wrap { position: sticky; top: calc(var(--pin) + var(--i, 0) * var(--peek)); margin-bottom: var(--gap); }
+  .pcard-wrap:last-child { margin-bottom: 0; }
+  .pcard {
+    position: relative; display: block; overflow: hidden; border-radius: 22px;
+    height: calc(100vh - var(--pin) - var(--gap) - 2 * var(--peek));
+    height: calc(100svh - var(--pin) - var(--gap) - 2 * var(--peek));
+    min-height: 460px; max-height: 900px;
+    background: #1A1A1A; color: #FAFAF8;
+    transform-origin: 50% 0;
+    box-shadow: 0 30px 80px -40px rgba(26,26,26,.45);
+  }
+  .pcard-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .pcard-scrim { position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(10,10,10,.62) 0%, rgba(10,10,10,.32) 46%, transparent 78%),
+      linear-gradient(90deg, rgba(10,10,10,.55) 0%, rgba(10,10,10,.28) 40%, transparent 70%); }
+  .pcard-inner { position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: flex-start; padding: clamp(20px, 3.4vw, 44px); }
+  .pcard-content { max-width: 420px; text-align: left; }
+  .pcard-tag { display: block; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: rgba(250,250,248,.85); margin-bottom: 10px; }
+  .pcard-client { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: rgba(250,250,248,.72); }
+  .pcard-title { font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; font-size: clamp(22px, 2.6vw, 38px); margin-top: 10px; color: #FAFAF8; }
+  .pcard-desc { font-size: 14.5px; line-height: 1.65; color: rgba(250,250,248,.85); margin-top: 14px; }
+  .pcard-go { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 13px; color: #FAFAF8; }
+  .pcard-go svg { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+  .pcard:hover .pcard-go svg { transform: translateX(4px); }
+  @media (max-width: 767px) {
+    .pstack { --pin: 84px; --peek: 10px; --gap: 20px; }
+    .pcard { border-radius: 16px; min-height: 0; height: calc(100svh - 128px); }
+    .pcard-scrim { background: linear-gradient(180deg, rgba(10,10,10,.64) 0%, rgba(10,10,10,.36) 48%, transparent 78%); }
+    .pcard-content { max-width: none; width: 100%; }
+    .pcard-desc { font-size: 13.5px; }
+    .pcard-tag { display: none; }
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background:#1A1A1A; color:#FAFAF8;
+    transition: background .25s, transform .25s, box-shadow .25s;
+  }
+  .btn-primary:hover { background:#CE1B24; }
+  .btn-ghost {
+    border:1px solid rgba(26,26,26,.25); color:#1A1A1A;
+    transition: border-color .25s, background .25s;
+  }
+  .btn-ghost:hover { border-color:#1A1A1A; background:rgba(26,26,26,.04); }
+  .btn-ghost-light {
+    border:1px solid rgba(250,250,248,.35); color:#FAFAF8;
+    transition: border-color .25s, background .25s;
+  }
+  .btn-ghost-light:hover { border-color:#FAFAF8; background:rgba(250,250,248,.06); }
+
+  /* Sticky nav glass */
+  .nav-glass { background: rgba(250, 250, 248, 0.82); backdrop-filter: saturate(1.3) blur(14px); -webkit-backdrop-filter: saturate(1.3) blur(14px); }
+
+  /* Grid lines */
+  .hairline-b { border-bottom: 1px solid #E5E2DA; }
+  .hairline-t { border-top: 1px solid #E5E2DA; }
+  .hairline-r { border-right: 1px solid #E5E2DA; }
+
+  /* Eyebrow — KOG green */
+  .eyebrow { font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#4C8B30; }
+
+  /* Marquee / audience strip */
+  .marquee { display:flex; gap: 3rem; animation: marquee 40s linear infinite; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* Hero gradient overlay — cinematic multi-stop + subtle warm rim */
+  .hero-overlay {
+    background:
+      linear-gradient(180deg, rgba(26,26,26,.48) 0%, rgba(26,26,26,.30) 22%, rgba(26,26,26,.55) 58%, rgba(26,26,26,.92) 100%),
+      radial-gradient(ellipse 60% 50% at 82% 18%, rgba(206,27,36,.12), transparent 60%);
+  }
+  @media (max-width: 640px) {
+    .hero-overlay {
+      background:
+        linear-gradient(180deg, rgba(26,26,26,.55) 0%, rgba(26,26,26,.34) 26%, rgba(26,26,26,.66) 60%, rgba(26,26,26,.95) 100%),
+        radial-gradient(ellipse 70% 45% at 80% 18%, rgba(206,27,36,.14), transparent 60%);
+    }
+  }
+  /* Hero scroll hint — mobile only */
+  .hero-scroll { position: absolute; bottom: 14px; right: 16px; display: flex; align-items: center; gap: 6px; color: rgba(250,250,248,.55); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; pointer-events: none; }
+  .hero-scroll svg { animation: scroll-pulse 2.4s ease-in-out infinite; }
+  @keyframes scroll-pulse { 0%,100% { transform: translateY(0); opacity:.55 } 50% { transform: translateY(4px); opacity:1 } }
+  @media (min-width: 641px) { .hero-scroll { display: none; } }
+
+  /* Display headings tighter */
+  .display { font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1.02; }
+  .display .italic { font-weight: 700; font-style: normal; }
+
+  /* Numbering — KOG red */
+  .num { font-family: 'Montserrat', Arial, sans-serif; font-feature-settings: "lnum","tnum"; color:#CE1B24; font-weight:700; }
+
+  /* Language element — flag dropdown (as on kogonderhoud.nl) */
+  .kog-lang { position: relative; }
+  .kog-lang__trigger { display:inline-flex; align-items:center; gap:7px; padding:6px 4px; border:0; background:none; cursor:pointer; color:#1A1A1A; font:inherit; }
+  .kog-flag { display:inline-flex; width:32px; height:23px; border:1px solid rgba(26,26,26,.12); overflow:hidden; flex:none; }
+  .kog-flag svg { width:100%; height:100%; display:block; }
+  .kog-lang__code { font-size:12px; font-weight:600; letter-spacing:.08em; }
+  .kog-lang__caret { width:9px; height:9px; opacity:.55; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+  .kog-lang.open .kog-lang__caret { transform: rotate(180deg); }
+  .kog-lang__menu {
+    position:absolute; top:100%; right:0; margin-top:8px; min-width:160px;
+    background:#FAFAF8; border:1px solid #E5E2DA; padding:6px;
+    box-shadow:0 22px 54px -24px rgba(26,26,26,.32);
+    opacity:0; visibility:hidden; transform: translateY(-4px);
+    transition: opacity .2s, transform .2s, visibility .2s; z-index:70; list-style:none;
+  }
+  .kog-lang.open .kog-lang__menu { opacity:1; visibility:visible; transform: translateY(0); }
+  .kog-lang__item { display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; background:none; border:0; cursor:pointer; font:inherit; font-size:13.5px; color:#1A1A1A; text-align:left; }
+  .kog-lang__item:hover { background:#F1F0EA; color:#CE1B24; }
+  .kog-lang__item[aria-selected="true"] { color:#CE1B24; font-weight:600; }
+
+  /* Focus ring */
+  :focus-visible { outline: 2px solid #CE1B24; outline-offset: 3px; border-radius: 2px; }
+
+  /* Hide scrollbar on horizontal strips */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Dot rule */
+  .dot::before { content:"·"; margin:0 .55rem; color:#CE1B24; }
+
+  /* Hero — use dvh on mobile so iOS chrome doesn't chop content */
+  .hero-h { height: calc(100vh - 92px); }
+  @supports (height: 100dvh) { .hero-h { height: calc(100dvh - 92px); } }
+
+  /* Hero cross-fading slideshow */
+  .hero-slides { position:absolute; inset:0; }
+  .hero-slide {
+    position:absolute; inset:0; opacity:0;
+    transition: opacity 1.6s ease-in-out;
+    will-change: opacity;
+  }
+  .hero-slide.active { opacity:1; }
+  .hero-slide img {
+    width:100%; height:100%; object-fit:cover;
+    filter: brightness(0.82);
+    /* slow Ken-Burns drift while a slide is showing */
+    transform: scale(1.06); transition: transform 7s ease-out;
+  }
+  .hero-slide.active img { transform: scale(1); }
+
+  /* Hero headline word — crossfades in sync with the slideshow */
+  .hero-word { display:inline-block; color:#5FA83C; transition: opacity .35s ease, transform .35s ease; }
+  .hero-word.swap { opacity:0; transform: translateY(10px); }
+
+  /* "Onderhoud met geheugen" — single cross-fading image block */
+  .mem-slide { position:absolute; inset:0; opacity:0; transition: opacity 1.4s ease-in-out; }
+  .mem-slide.active { opacity:1; }
+  .mem-slide img { width:100%; height:100%; object-fit:cover; display:block; }
+  @media (max-width: 640px) {
+    .hero-slide img { object-position: 60% 30%; }
+  }
+
+  /* Hero compact trust strip — used below lg breakpoint */
+  .hero-trust-strip { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .6rem; }
+  .hero-trust-strip > .trust-item { display: inline-flex; align-items: baseline; gap: .5rem; }
+  .hero-trust-strip > .trust-item + .trust-item::before { content: ""; display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: rgba(250,250,248,.35); transform: translateY(-3px); margin-right: .5rem; }
+  .hero-trust-strip > .trust-item > .stat-num { font-family:'Montserrat', serif; color: #E23B42; font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: -.01em; }
+  .hero-trust-strip > .trust-item > .stat-label { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: rgba(250,250,248,.72); font-weight: 500; }
+
+  /* Modals */
+  .modal { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:16px; }
+  .modal.open { display:flex; }
+  .modal-backdrop { position:absolute; inset:0; background:rgba(26,26,26,.55); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+  .modal-panel { position:relative; background:#FAFAF8; border-radius:18px; max-width:720px; width:100%; max-height:92vh; overflow:auto; box-shadow:0 30px 80px rgba(0,0,0,.35); animation:modal-in .25s ease-out; }
+  .modal-panel.maps { max-width:960px; padding-bottom:0; }
+  @keyframes modal-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .modal-close { position:absolute; top:14px; right:14px; width:36px; height:36px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:rgba(26,26,26,.06); transition:background .15s; cursor:pointer; border:0; z-index:2; }
+  .modal-close:hover { background:rgba(26,26,26,.12); }
+  .form-field { display:block; margin-bottom:14px; }
+  .form-field > label { display:block; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#6B6862; margin-bottom:6px; }
+  .form-field > input, .form-field > select, .form-field > textarea {
+    width:100%; padding:12px 14px; border:1px solid #E5E2DA; background:#fff; border-radius:2px;
+    font-family:'Montserrat',sans-serif; font-size:14px; color:#1A1A1A; transition:border-color .15s, box-shadow .15s;
+  }
+  .form-field > input:focus, .form-field > select:focus, .form-field > textarea:focus {
+    outline:none; border-color:#CE1B24; box-shadow:0 0 0 3px rgba(206,27,36,.18);
+  }
+  .form-field > textarea { resize:vertical; min-height:96px; }
+  .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:0 14px; }
+  @media (max-width:540px) { .form-grid-2 { grid-template-columns:1fr; } }
+  body.modal-open { overflow:hidden; }
+
+  /* Quote form — building-component chips */
+  .quote-chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .quote-chip {
+    display:inline-flex; align-items:center; gap:7px; padding:9px 14px; border:1px solid #E5E2DA;
+    border-radius:999px; font-size:13px; color:#1A1A1A; cursor:pointer; transition:border-color .15s, background-color .15s; user-select:none;
+  }
+  .quote-chip input { accent-color:#CE1B24; }
+  .quote-chip:has(input:checked) { border-color:#CE1B24; background:rgba(206,27,36,.06); color:#A3141B; }
+
+  /* Quote form — photo upload */
+  .form-field > input[type="file"] { padding:10px 14px; cursor:pointer; }
+  .quote-photo-previews { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .quote-photo-previews:empty { margin-top:0; }
+  .quote-photo-thumb { position:relative; width:64px; height:64px; border-radius:6px; overflow:hidden; border:1px solid #E5E2DA; }
+  .quote-photo-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .quote-photo-thumb button {
+    position:absolute; top:2px; right:2px; width:18px; height:18px; border-radius:50%; border:0;
+    background:rgba(26,26,26,.65); color:#fff; font-size:11px; line-height:18px; text-align:center; cursor:pointer;
+  }
+
+  /* ===== Mega-menu (desktop) ===== */
+  .nav-item { position: relative; }
+  .nav-trigger { display:inline-flex; align-items:center; gap:5px; cursor:pointer; background:none; border:0; font:inherit; color:inherit; padding:0; }
+  .nav-caret { width:9px; height:9px; transition: transform .3s cubic-bezier(.2,.7,.2,1); opacity:.6; }
+  .nav-item:hover .nav-caret, .nav-item:focus-within .nav-caret { transform: rotate(180deg); }
+  .nav-panel {
+    position:absolute; top:100%; left:50%;
+    transform: translateX(-50%) translateY(4px);
+    min-width:236px; background:rgba(250,250,248,.98);
+    backdrop-filter: saturate(1.2) blur(16px); -webkit-backdrop-filter: saturate(1.2) blur(16px);
+    border:1px solid #E5E2DA; border-radius:14px; padding:8px;
+    box-shadow:0 26px 60px -26px rgba(26,26,26,.32);
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition: opacity .24s cubic-bezier(.2,.7,.2,1), transform .24s cubic-bezier(.2,.7,.2,1), visibility .24s;
+    z-index:60;
+  }
+  .nav-panel::before { content:""; position:absolute; top:-12px; left:0; right:0; height:12px; } /* hover bridge */
+  .nav-item:hover .nav-panel, .nav-item:focus-within .nav-panel {
+    opacity:1; visibility:visible; pointer-events:auto; transform: translateX(-50%) translateY(9px);
+  }
+  .nav-panel a { display:block; padding:9px 12px; border-radius:9px; font-size:13.5px; line-height:1.25; color:#1A1A1A; white-space:nowrap; transition: background .15s, color .15s; }
+  .nav-panel a:hover { background:#F1F0EA; color:#CE1B24; }
+
+  /* ===== Mobile / tablet menu ===== */
+  .burger { display:inline-flex; flex-direction:column; justify-content:center; gap:5px; width:40px; height:40px; border:1px solid rgba(26,26,26,.15); border-radius:999px; align-items:center; background:none; cursor:pointer; }
+  .burger span { display:block; width:17px; height:1.5px; background:#1A1A1A; transition: transform .3s, opacity .3s; }
+  body.mnav-open .burger span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  body.mnav-open .burger span:nth-child(2) { opacity:0; }
+  body.mnav-open .burger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+  .mobile-nav {
+    position:fixed; top:92px; left:0; right:0; bottom:0; z-index:45;
+    background:rgba(250,250,248,.99); backdrop-filter: blur(8px);
+    overflow-y:auto; padding:22px 20px 40px;
+    opacity:0; visibility:hidden; transform: translateY(-8px);
+    transition: opacity .3s, transform .3s, visibility .3s;
+  }
+  body.mnav-open .mobile-nav { opacity:1; visibility:visible; transform: translateY(0); }
+  body.mnav-open { overflow:hidden; }
+  .mnav-group { border-top:1px solid #E5E2DA; padding:16px 0 4px; }
+  .mnav-group:first-child { border-top:0; }
+  .mnav-group > .mnav-head { font-family:'Montserrat',serif; font-size:20px; color:#CE1B24; letter-spacing:-.02em; }
+  .mnav-group ul { margin-top:8px; }
+  .mnav-group li a { display:block; padding:8px 0 8px 14px; font-size:15px; color:#1A1A1A; border-left:2px solid #E5E2DA; margin-left:2px; transition:border-color .15s,color .15s; }
+  .mnav-group li a:hover { color:#CE1B24; border-color:#CE1B24; }
+</style>
+</head>
+<body class="bg-paper text-ink">
+
+<!-- ====== NAV ====== -->
+<header id="nav" class="fixed top-0 inset-x-0 z-50 nav-glass hairline-b">
+  <div class="max-w-[1400px] mx-auto px-5 md:px-8 h-[92px] flex items-center justify-between gap-6">
+    <a href="#top" class="flex items-center group shrink-0" aria-label="Kortlevers Onderhoud Groep">
+      <img src="assets/kog-logo.png" alt="KOG — Kortlevers Onderhoud Groep" class="h-16 md:h-[68px] w-auto select-none" />
+    </a>
+
+    <nav class="hidden xl:flex items-center gap-6 text-[13.5px] text-ink/80">
+      <!-- Voor bewoners -->
+      <div class="nav-item">
+        <a href="#projecten" class="nav-trigger nav-link"><span data-i18n="nav.residents">Voor bewoners</span><svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+        <div class="nav-panel">
+          <a href="#contact"   data-i18n="nav.residents.callback">Terugbelverzoek</a>
+          <a href="#projecten" data-i18n="nav.residents.project">Project bij u in de buurt</a>
+        </div>
+      </div>
+      <!-- Dagelijks onderhoud -->
+      <div class="nav-item">
+        <a href="#projecten" class="nav-trigger nav-link"><span data-i18n="nav.service">Dagelijks onderhoud</span><svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+        <div class="nav-panel">
+          <a href="#projecten"  data-i18n="nav.service.daily">Dagelijks onderhoud</a>
+          <a href="#projecten"  data-i18n="nav.service.planned">Planmatig onderhoud</a>
+          <a href="#projecten" data-i18n="nav.service.area">Werkzaamheden bij u in de buurt</a>
+        </div>
+      </div>
+      <!-- Duurzaam wonen -->
+      <div class="nav-item">
+        <a href="#geheugen" class="nav-trigger nav-link"><span data-i18n="nav.sustain">Duurzaam wonen</span><svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+        <div class="nav-panel">
+          <a href="#projecten" data-i18n="nav.sustain.glass">Energiezuinig glas</a>
+          <a href="#projecten" data-i18n="nav.sustain.roof">Verduurzaming van uw dak</a>
+        </div>
+      </div>
+      <!-- Sectoren -->
+      <div class="nav-item">
+        <a href="#projecten" class="nav-trigger nav-link"><span data-i18n="nav.sectors">Sectoren</span><svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+        <div class="nav-panel">
+          <a href="#projecten" data-i18n="nav.sectors.vve">VvE-beheer</a>
+          <a href="#projecten" data-i18n="nav.sectors.corp">Woningcorporaties</a>
+          <a href="#projecten" data-i18n="nav.sectors.biz">Zakelijke markt</a>
+          <a href="#projecten" data-i18n="nav.sectors.private">Particuliere markt</a>
+        </div>
+      </div>
+      <!-- Disciplines -->
+      <div class="nav-item">
+        <a href="#projecten" class="nav-trigger nav-link"><span data-i18n="nav.disciplines">Disciplines</span><svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+        <div class="nav-panel">
+          <a href="#projecten" data-i18n="nav.disc.build">Bouw &amp; renovatie</a>
+          <a href="#projecten" data-i18n="nav.disc.paint">Schilderwerk</a>
+          <a href="#projecten" data-i18n="nav.disc.roof">Dakwerkzaamheden</a>
+          <a href="#projecten" data-i18n="nav.disc.elec">Elektrotechniek</a>
+        </div>
+      </div>
+      <!-- Hoogwerker-service -->
+      <div class="nav-item">
+        <a href="#projecten" class="nav-trigger nav-link"><span data-i18n="nav.aerial">Hoogwerker-service</span><svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+        <div class="nav-panel">
+          <a href="#projecten" data-i18n="nav.aerial.gutter">Gootonderhoud op hoogte</a>
+          <a href="#projecten" data-i18n="nav.aerial.inspect">Dakinspectie &amp; -onderhoud</a>
+          <a href="#projecten" data-i18n="nav.aerial.build">Bouwinspecties &amp; begeleiding</a>
+        </div>
+      </div>
+      <!-- Contact -->
+      <div class="nav-item">
+        <a href="#contact" class="nav-trigger nav-link"><span data-i18n="nav.contact">Contact</span><svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+        <div class="nav-panel">
+          <a href="#contact" data-i18n="nav.contact.details">Contactgegevens</a>
+          <a href="#contact" data-i18n="nav.contact.jobs">Werken bij</a>
+          <a href="#contact" data-i18n="nav.contact.feedback">Klacht of compliment</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="flex items-center gap-3 shrink-0">
+      <a href="mijn-pand/" class="hidden xl:inline-flex items-center gap-2 mr-5 text-[15px] text-ink/85 hover:text-sienna transition-colors" data-i18n-title="nav.signin">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span data-i18n="nav.signin">Inloggen</span>
+      </a>
+      <!-- Language element (flag dropdown, as on kogonderhoud.nl) -->
+      <div class="kog-lang" id="kog-lang">
+        <button type="button" class="kog-lang__trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Taal / Language">
+          <span class="kog-flag" id="lang-flag" aria-hidden="true"><svg viewBox="0 0 60 45"><rect width="60" height="45" fill="#fff"/><rect width="60" height="15" fill="#AE1C28"/><rect y="30" width="60" height="15" fill="#21468B"/></svg></span>
+          <svg class="kog-lang__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <ul class="kog-lang__menu" role="listbox" aria-label="Taal / Language">
+          <li><button type="button" class="kog-lang__item" data-lang="nl" role="option" aria-selected="true">
+            <span class="kog-flag" aria-hidden="true"><svg viewBox="0 0 60 45"><rect width="60" height="45" fill="#fff"/><rect width="60" height="15" fill="#AE1C28"/><rect y="30" width="60" height="15" fill="#21468B"/></svg></span>
+            <span>Nederlands</span>
+          </button></li>
+          <li><button type="button" class="kog-lang__item" data-lang="en" role="option" aria-selected="false">
+            <span class="kog-flag" aria-hidden="true"><svg viewBox="0 0 60 45"><clipPath id="gbAm"><path d="M0,0 v45 h60 v-45 z"/></clipPath><clipPath id="gbBm"><path d="M30,22.5 h30 v22.5 z v22.5 h-30 z h-30 v-22.5 z v-22.5 h30 z"/></clipPath><g clip-path="url(#gbAm)"><path d="M0,0 v45 h60 v-45 z" fill="#012169"/><path d="M0,0 L60,45 M60,0 L0,45" stroke="#fff" stroke-width="9"/><path d="M0,0 L60,45 M60,0 L0,45" clip-path="url(#gbBm)" stroke="#C8102E" stroke-width="6"/><path d="M30,0 v45 M0,22.5 h60" stroke="#fff" stroke-width="15"/><path d="M30,0 v45 M0,22.5 h60" stroke="#C8102E" stroke-width="9"/></g></svg></span>
+            <span>English</span>
+          </button></li>
+        </ul>
+      </div>
+      <button id="burger" class="burger xl:hidden" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ====== MOBILE NAV ====== -->
+<div id="mobile-nav" class="mobile-nav">
+  <div class="max-w-[720px] mx-auto">
+    <div class="mnav-group">
+      <a href="#projecten" class="mnav-head" data-close-mnav data-i18n="nav.residents">Voor bewoners</a>
+      <ul>
+        <li><a href="#contact"   data-close-mnav data-i18n="nav.residents.callback">Terugbelverzoek</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.residents.project">Project bij u in de buurt</a></li>
+      </ul>
+    </div>
+    <div class="mnav-group">
+      <a href="#projecten" class="mnav-head" data-close-mnav data-i18n="nav.service">Dagelijks onderhoud</a>
+      <ul>
+        <li><a href="#projecten"  data-close-mnav data-i18n="nav.service.daily">Dagelijks onderhoud</a></li>
+        <li><a href="#projecten"  data-close-mnav data-i18n="nav.service.planned">Planmatig onderhoud</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.service.area">Werkzaamheden bij u in de buurt</a></li>
+      </ul>
+    </div>
+    <div class="mnav-group">
+      <a href="#geheugen" class="mnav-head" data-close-mnav data-i18n="nav.sustain">Duurzaam wonen</a>
+      <ul>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.sustain.glass">Energiezuinig glas</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.sustain.roof">Verduurzaming van uw dak</a></li>
+      </ul>
+    </div>
+    <div class="mnav-group">
+      <a href="#projecten" class="mnav-head" data-close-mnav data-i18n="nav.sectors">Sectoren</a>
+      <ul>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.sectors.vve">VvE-beheer</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.sectors.corp">Woningcorporaties</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.sectors.biz">Zakelijke markt</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.sectors.private">Particuliere markt</a></li>
+      </ul>
+    </div>
+    <div class="mnav-group">
+      <a href="#projecten" class="mnav-head" data-close-mnav data-i18n="nav.disciplines">Disciplines</a>
+      <ul>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.disc.build">Bouw &amp; renovatie</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.disc.paint">Schilderwerk</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.disc.roof">Dakwerkzaamheden</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.disc.elec">Elektrotechniek</a></li>
+      </ul>
+    </div>
+    <div class="mnav-group">
+      <a href="#projecten" class="mnav-head" data-close-mnav data-i18n="nav.aerial">Hoogwerker-service</a>
+      <ul>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.aerial.gutter">Gootonderhoud op hoogte</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.aerial.inspect">Dakinspectie &amp; -onderhoud</a></li>
+        <li><a href="#projecten" data-close-mnav data-i18n="nav.aerial.build">Bouwinspecties &amp; begeleiding</a></li>
+      </ul>
+    </div>
+    <div class="mnav-group">
+      <a href="#contact" class="mnav-head" data-close-mnav data-i18n="nav.contact">Contact</a>
+      <ul>
+        <li><a href="#contact" data-close-mnav data-i18n="nav.contact.details">Contactgegevens</a></li>
+        <li><a href="#contact" data-close-mnav data-i18n="nav.contact.jobs">Werken bij</a></li>
+        <li><a href="#contact" data-close-mnav data-i18n="nav.contact.feedback">Klacht of compliment</a></li>
+      </ul>
+    </div>
+    <div class="mt-8 flex items-center gap-3">
+      <a href="mijn-pand/" class="inline-flex items-center gap-2 text-[15px] text-ink/85" data-close-mnav>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span data-i18n="nav.signin">Inloggen</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<main id="top" class="pt-[92px]">
+
+<!-- ====== HERO ====== -->
+<section class="relative border-b border-paper/10">
+  <div class="relative hero-h min-h-[600px] max-h-[940px] overflow-hidden bg-ink">
+    <div id="hero-slides" class="hero-slides" aria-hidden="true">
+      <div class="hero-slide active"><img src="assets/hero-van.jpg"        alt="" fetchpriority="high" onerror="this.closest('.hero-slide').style.display='none'"></div>
+      <div class="hero-slide"><img src="assets/hero-scaffold.jpg"   alt="" loading="lazy" onerror="this.closest('.hero-slide').style.display='none'"></div>
+      <div class="hero-slide"><img src="assets/hero-balcony.jpg"    alt="" loading="lazy" onerror="this.closest('.hero-slide').style.display='none'"></div>
+      <div class="hero-slide"><img src="assets/hero-sanding.jpg"    alt="" loading="lazy" onerror="this.closest('.hero-slide').style.display='none'"></div>
+      <div class="hero-slide"><img src="assets/hero-hoogwerker.jpg" alt="" loading="lazy" onerror="this.closest('.hero-slide').style.display='none'"></div>
+      <div class="hero-slide"><img src="assets/hero-brush.jpg"      alt="" loading="lazy" onerror="this.closest('.hero-slide').style.display='none'"></div>
+      <div class="hero-slide"><img src="assets/hero-hinge.jpg"      alt="" loading="lazy" onerror="this.closest('.hero-slide').style.display='none'"></div>
+      <div class="hero-slide"><img src="assets/hero-blueprint.jpg"  alt="" loading="lazy" onerror="this.closest('.hero-slide').style.display='none'"></div>
+    </div>
+    <div class="absolute inset-0 hero-overlay"></div>
+
+    <!-- Headline block -->
+    <div class="absolute inset-x-0 bottom-0">
+      <div class="max-w-[1400px] mx-auto px-5 sm:px-6 md:px-10 pb-8 sm:pb-8 md:pb-10">
+        <div class="grid grid-cols-12 gap-6 sm:gap-8 items-end">
+          <div class="col-span-12 lg:col-span-9">
+            <h1 class="reveal display text-paper text-[42px] sm:text-[58px] md:text-[76px] lg:text-[92px] leading-[1.02]">
+              <span id="hero-word" class="hero-word">Schilderwerk</span><br/>
+              <span class="italic" style="color:rgba(250,250,248,.92);" data-i18n="hero.h1b">met geheugen.</span>
+            </h1>
+            <p class="reveal reveal-delay-1 mt-5 md:mt-5 max-w-[640px] text-paper/80 text-[14.5px] sm:text-[15px] md:text-[16.5px] leading-[1.65]" data-i18n="hero.sub">
+              Onderhoud, herstel en verfraaiing van vastgoed, vastgelegd in een blijvend dossier zodat niets wordt vergeten, ook lang nadat de meeste aannemers zijn vertrokken. De vaste onderhoudspartner voor VvE&rsquo;s, woningcorporaties en vastgoedbeheerders in Noord-Holland.
+            </p>
+            <div class="reveal reveal-delay-2 mt-7 md:mt-6 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
+              <a href="#contact"   class="btn-primary inline-flex items-center justify-center gap-2 px-6 py-4 sm:py-3.5 text-[14px] w-full sm:w-auto" data-i18n="hero.ctaPrimary">Vraag een offerte aan
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+              <a href="mijn-pand/" class="btn-ghost-light inline-flex items-center justify-center gap-2 px-6 py-4 sm:py-3.5 text-[14px] w-full sm:w-auto">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span data-i18n="nav.signin">Inloggen</span>
+              </a>
+            </div>
+
+            <!-- Compact trust strip (shown below lg) -->
+            <div class="reveal reveal-delay-3 hero-trust-strip mt-7 lg:hidden">
+              <div class="trust-item">
+                <span class="stat-num">?<span style="font-size:.7em;">+</span></span>
+                <span class="stat-label" data-i18n="trust.years">jaar in het vak</span>
+              </div>
+              <div class="trust-item">
+                <span class="stat-num">?<span style="font-size:.7em;">+</span></span>
+                <span class="stat-label" data-i18n="trust.clients">klanten geholpen</span>
+              </div>
+              <div class="trust-item">
+                <span class="stat-num" style="font-style:italic;">★</span>
+                <span class="stat-label" data-i18n="trust.fileShort">elk pand een dossier</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop trust stats column (lg+ only) -->
+          <aside class="reveal reveal-delay-3 col-span-12 lg:col-span-3 hidden lg:block lg:border-l border-paper/20 lg:pl-7">
+            <dl class="grid grid-cols-1 gap-4">
+              <div>
+                <dt class="font-serif text-[34px] leading-none" style="color:#E23B42;font-weight:800;">?<span style="font-size:.7em;">+</span></dt>
+                <dd class="text-[11px] mt-1.5 tracking-[.18em] uppercase font-semibold text-paper/85" data-i18n="trust.years">jaar in het vak</dd>
+              </div>
+              <div>
+                <dt class="font-serif text-[34px] leading-none" style="color:#E23B42;font-weight:800;">?<span style="font-size:.7em;">+</span></dt>
+                <dd class="text-[11px] mt-1.5 tracking-[.18em] uppercase font-semibold text-paper/85" data-i18n="trust.clients">klanten geholpen</dd>
+              </div>
+              <div>
+                <dt class="font-serif italic text-[34px] leading-none" style="color:#5FA83C;">★</dt>
+                <dd class="text-[11px] mt-1.5 tracking-[.18em] uppercase leading-snug font-semibold text-paper/85" data-i18n="trust.file">Vastgoedzorg &amp; schilderwerk</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile-only scroll hint -->
+    <div class="hero-scroll" aria-hidden="true">
+      <span>Scroll</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ====== ONDERHOUD MET GEHEUGEN (USP) ====== -->
+<section id="geheugen" class="border-b border-rule bg-paper2/50">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 py-20 md:py-28 grid grid-cols-12 gap-8 md:gap-14 items-stretch">
+    <!-- TEXT (left on desktop) -->
+    <div class="col-span-12 md:col-span-7 order-2 md:order-1">
+      <div class="eyebrow reveal mb-3">— <span data-i18n="mem.eyebrow">Onderhoud met geheugen</span></div>
+      <h2 class="reveal display text-[40px] md:text-[60px] tracking-tightest2" data-i18n="mem.title">Wij onthouden<br/><span class="italic" style="color:#CE1B24">uw pand.</span></h2>
+      <p class="reveal reveal-delay-1 mt-6 text-[16.5px] text-ink/80 leading-[1.7] max-w-[720px]" data-i18n="mem.p1">
+        Een gewone schilder komt, werkt en vertrekt. Voor KOG stopt goed onderhoud niet bij oplevering: per pand en per project leggen wij vast welk bouwdeel is behandeld, met welke materialen is gewerkt, welke onderdelen aandacht nodig hebben en wanneer het volgende onderhoud aan de beurt is, compleet met foto&rsquo;s vóór en ná.
+      </p>
+      <p class="reveal reveal-delay-2 mt-4 text-[16.5px] text-ink/80 leading-[1.7] max-w-[720px]" data-i18n="mem.p2">
+        Zo krijgt u niet alleen vakkundig schilderwerk, maar ook inzicht in de toekomst van uw pand. Onderhoud wordt voorspelbaar in plaats van reactief: u wordt op het juiste moment benaderd, vóórdat schade ontstaat. Dat is vastgoedzorg: meedenken over de lange termijn, niet alleen een kwast hanteren.
+      </p>
+
+      <ul class="reveal reveal-delay-2 mt-10 space-y-4 max-w-[680px]">
+        <li class="flex items-start gap-4 border-t border-rule pt-4">
+          <span class="num text-[14px] mt-1" style="color:#4C8B30;">01</span>
+          <div>
+            <div class="font-serif text-[20px]" data-i18n="mem.step1.t">Vastleggen</div>
+            <p class="text-[14px] text-mute mt-1" data-i18n="mem.step1.d">Elk uitgevoerd werk gedocumenteerd met materiaal en foto&rsquo;s.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4 border-t border-rule pt-4">
+          <span class="num text-[14px] mt-1" style="color:#4C8B30;">02</span>
+          <div>
+            <div class="font-serif text-[20px]" data-i18n="mem.step2.t">Bewaren</div>
+            <p class="text-[14px] text-mute mt-1" data-i18n="mem.step2.d">De volledige historie per pand blijft bewaard, jaar na jaar.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4 border-t border-rule pt-4">
+          <span class="num text-[14px] mt-1" style="color:#4C8B30;">03</span>
+          <div>
+            <div class="font-serif text-[20px]" data-i18n="mem.step3.t">Vooruitkijken</div>
+            <p class="text-[14px] text-mute mt-1" data-i18n="mem.step3.d">De volgende inspectie wordt automatisch gepland en geadviseerd.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- IMAGE (right on desktop) — single block, cross-fading through KOG photos -->
+    <div class="col-span-12 md:col-span-5 md:col-start-8 order-1 md:order-2 reveal">
+      <div id="mem-slides" class="mem-slides relative w-full h-full min-h-[440px] overflow-hidden bg-paper2" aria-hidden="true">
+        <div class="mem-slide active"><img src="assets/hero-blueprint.jpg" alt="" onerror="this.closest('.mem-slide').style.display='none'"></div>
+        <div class="mem-slide"><img src="assets/hero-sanding.jpg"   alt="" loading="lazy" onerror="this.closest('.mem-slide').style.display='none'"></div>
+        <div class="mem-slide"><img src="assets/hero-brush.jpg"     alt="" loading="lazy" onerror="this.closest('.mem-slide').style.display='none'"></div>
+        <div class="mem-slide"><img src="assets/hero-scaffold.jpg"  alt="" loading="lazy" onerror="this.closest('.mem-slide').style.display='none'"></div>
+        <div class="mem-slide"><img src="assets/hero-hinge.jpg"     alt="" loading="lazy" onerror="this.closest('.mem-slide').style.display='none'"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== PROJECTEN ====== -->
+<section id="projecten" class="border-b border-rule">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 py-20 md:py-28">
+    <div class="flex items-end justify-between flex-wrap gap-6 mb-12 md:mb-16">
+      <div>
+        <div class="eyebrow reveal mb-3">— <span data-i18n="proj.eyebrow">Projecten</span></div>
+        <h2 class="reveal display text-[40px] md:text-[60px]" data-i18n="proj.title">Werk dat<br/><span class="italic" style="color:#CE1B24">voor zichzelf spreekt.</span></h2>
+      </div>
+      <a href="#contact" class="reveal reveal-delay-1 inline-flex items-center gap-2 text-[14px] text-ink/80 hover:text-sienna transition-colors group">
+        <span data-i18n="proj.cta">Bespreek uw project</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+
+    <!-- Pinned dossier stack: each card is sticky; the next slides up over it as you scroll -->
+    <div class="pstack" id="pstack">
+
+      <!-- Project 1 -->
+      <div class="pcard-wrap" style="--i:0; z-index:1;">
+        <a href="#contact" class="pcard group" aria-label="Planmatig buitenschilderwerk VvE-complex">
+          <img
+            src="assets/hero-scaffold.jpg"
+            onerror="this.style.display='none'; this.parentElement.classList.add('ph-stripes');"
+            alt="Planmatig buitenschilderwerk VvE-complex"
+            class="pcard-img" />
+          <div class="pcard-scrim"></div>
+          <div class="pcard-inner">
+            <div class="pcard-content">
+              <span class="pcard-tag" data-i18n="proj.1.tag">Planmatig</span>
+              <div class="pcard-client" data-i18n="proj.1.client">VvE-complex · Noord-Holland</div>
+              <h3 class="pcard-title" data-i18n="proj.1.t">Planmatig buitenschilderwerk<br/>&amp; houtrotherstel</h3>
+              <p class="pcard-desc" data-i18n="proj.1.d">Korte projectomschrijving. Deze tekst wordt later vervangen door de projectgegevens.</p>
+              <span class="pcard-go"><span data-i18n="proj.cta">Bespreek uw project</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Project 2 -->
+      <div class="pcard-wrap" style="--i:1; z-index:2;">
+        <a href="#contact" class="pcard group" aria-label="Gevelherstel woningcorporatie">
+          <img
+            src="assets/hero-balcony.jpg"
+            onerror="this.style.display='none'; this.parentElement.classList.add('ph-stripes');"
+            alt="Gevelherstel woningcorporatie"
+            class="pcard-img" />
+          <div class="pcard-scrim"></div>
+          <div class="pcard-inner">
+            <div class="pcard-content">
+              <span class="pcard-tag" data-i18n="proj.2.tag">Renovatie</span>
+              <div class="pcard-client" data-i18n="proj.2.client">Woningcorporatie</div>
+              <h3 class="pcard-title" data-i18n="proj.2.t">Gevelherstel &amp; renovatie<br/>meerjarig onderhoud</h3>
+              <p class="pcard-desc" data-i18n="proj.2.d">Korte projectomschrijving. Deze tekst wordt later vervangen door de projectgegevens.</p>
+              <span class="pcard-go"><span data-i18n="proj.cta">Bespreek uw project</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Project 3 -->
+      <div class="pcard-wrap" style="--i:2; z-index:3;">
+        <a href="#contact" class="pcard group" aria-label="Renovatie en schilderwerk met hoogwerker">
+          <img
+            src="assets/hero-hoogwerker.jpg"
+            onerror="this.style.display='none'; this.parentElement.classList.add('ph-stripes');"
+            alt="Renovatie en schilderwerk met hoogwerker"
+            class="pcard-img" />
+          <div class="pcard-scrim"></div>
+          <div class="pcard-inner">
+            <div class="pcard-content">
+              <span class="pcard-tag" data-i18n="proj.3.tag">Totaalonderhoud</span>
+              <div class="pcard-client" data-i18n="proj.3.client">Particuliere woning · IJmond</div>
+              <h3 class="pcard-title" data-i18n="proj.3.t">Renovatie, schilderwerk &amp; dakonderhoud met dossier</h3>
+              <p class="pcard-desc" data-i18n="proj.3.d">Eén partij voor het complete pand: schilderwerk, houtrotherstel en dak. Alles vastgelegd, met een advies voor het onderhoud van de komende jaren.</p>
+              <span class="pcard-go"><span data-i18n="proj.cta">Bespreek uw project</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ====== LOCATIE & WERKGEBIED ====== -->
+<section>
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 pt-20 md:pt-28 pb-8 md:pb-10">
+    <div class="mb-12 md:mb-16">
+      <div class="eyebrow reveal mb-3">— <span data-i18n="loc.eyebrow">Locatie &amp; werkgebied</span></div>
+      <h2 class="reveal display text-[40px] md:text-[60px]" data-i18n="loc.title">Gevestigd in Beverwijk,<br/><span class="italic" style="color:#CE1B24">actief in heel Noord-Holland.</span></h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 border-t border-rule">
+      <article class="reveal p-8 md:p-10 md:hairline-r border-b md:border-b-0 border-rule">
+        <div class="flex items-baseline justify-between">
+          <h3 class="font-serif text-[30px] tracking-tightest2" data-i18n="loc.1.t">Vestiging</h3>
+          <span class="num text-[14px]">01</span>
+        </div>
+        <p class="mt-6 text-[15px] leading-relaxed text-ink/80">
+          Kortlevers Onderhoud Groep B.V.<br/>1948 RC Beverwijk<br/>Noord-Holland
+        </p>
+        <div class="mt-6 rounded-lg overflow-hidden border border-rule" style="aspect-ratio:4/3;">
+          <iframe
+            src="https://www.google.com/maps?q=Beverwijk%2C%20Netherlands&output=embed"
+            width="100%" height="100%" style="border:0;display:block;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Kaart Beverwijk"></iframe>
+        </div>
+        <a href="https://www.google.com/maps/search/?api=1&query=Beverwijk%2C%20Netherlands" target="_blank" rel="noopener" class="mt-4 inline-flex items-center gap-2 text-[13px] text-sienna hover:text-sienna2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M21 14v7H3V3h7"/></svg>
+          <span data-i18n="loc.openInMaps">Open in Google Maps</span>
+        </a>
+      </article>
+      <article class="reveal reveal-delay-1 p-8 md:p-10 md:hairline-r border-b md:border-b-0 border-rule">
+        <div class="flex items-baseline justify-between">
+          <h3 class="font-serif text-[30px] tracking-tightest2" data-i18n="loc.2.t">Werkgebied</h3>
+          <span class="num text-[14px]">02</span>
+        </div>
+        <p class="mt-6 text-[15px] leading-relaxed text-ink/80" data-i18n="loc.2.body">
+          Wij werken door heel Noord-Holland, met de IJmond en Kennemerland als thuisbasis.
+        </p>
+        <ul class="mt-6 grid grid-cols-2 gap-x-4 gap-y-2 text-[14px] text-ink/75">
+          <li class="flex items-center gap-2"><span class="text-leaf">◆</span> Beverwijk</li>
+          <li class="flex items-center gap-2"><span class="text-leaf">◆</span> Heemskerk</li>
+          <li class="flex items-center gap-2"><span class="text-leaf">◆</span> Velsen / IJmuiden</li>
+          <li class="flex items-center gap-2"><span class="text-leaf">◆</span> Haarlem</li>
+          <li class="flex items-center gap-2"><span class="text-leaf">◆</span> Zaanstreek</li>
+          <li class="flex items-center gap-2"><span class="text-leaf">◆</span> Alkmaar</li>
+          <li class="flex items-center gap-2"><span class="text-leaf">◆</span> Amsterdam</li>
+          <li class="flex items-center gap-2"><span class="text-leaf">◆</span> Regio breed</li>
+        </ul>
+      </article>
+      <article class="reveal reveal-delay-2 p-8 md:p-10">
+        <div class="flex items-baseline justify-between">
+          <h3 class="font-serif text-[30px] tracking-tightest2" data-i18n="loc.3.t">Bereikbaarheid</h3>
+          <span class="num text-[14px]">03</span>
+        </div>
+        <dl class="mt-6 space-y-5 text-[15px]">
+          <div>
+            <dt class="text-[11px] tracking-[.18em] uppercase text-mute" data-i18n="loc.phone">Telefoon</dt>
+            <dd class="mt-1"><a href="tel:+31202600098" class="text-ink/85 hover:text-sienna transition-colors tabular-nums">+31 20 26 000 98</a></dd>
+          </div>
+          <div>
+            <dt class="text-[11px] tracking-[.18em] uppercase text-mute" data-i18n="loc.email">E-mail</dt>
+            <dd class="mt-1"><a href="mailto:info@kogonderhoud.nl" class="text-ink/85 hover:text-sienna transition-colors">info@kogonderhoud.nl</a></dd>
+          </div>
+          <div>
+            <dt class="text-[11px] tracking-[.18em] uppercase text-mute" data-i18n="loc.hours">Openingstijden</dt>
+            <dd class="mt-1 text-ink/85" data-i18n="loc.hoursval">Ma–Vr · 07:30 – 17:00</dd>
+          </div>
+        </dl>
+        <a href="#contact" class="mt-8 inline-flex items-center gap-2 text-[13px] text-sienna hover:text-sienna2">
+          <span data-i18n="loc.quote">Vraag een offerte aan</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ====== BIG LOGO ====== -->
+<section class="border-b border-rule bg-paper">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 pt-6 md:pt-8 pb-16 md:pb-24 flex justify-center">
+    <img src="assets/kog-logo-big.png"
+         alt="Kortlevers Onderhoud Groep B.V. — vastgoedzorg &amp; schilderwerk"
+         onerror="this.style.display='none'"
+         class="reveal w-full max-w-[560px] md:max-w-[860px] h-auto select-none" />
+  </div>
+</section>
+
+<!-- ====== CONTACT CTA ====== -->
+<section id="contact" class="bg-ink text-paper">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 py-24 md:py-36">
+    <div class="grid grid-cols-12 gap-8 items-end">
+      <div class="col-span-12 md:col-span-8">
+        <div class="eyebrow mb-4" style="color:#7FC65C;">— <span data-i18n="cta.eyebrow">Contact</span></div>
+        <h2 class="display text-[48px] md:text-[88px] lg:text-[108px] leading-[.95]" data-i18n="cta.title">Een project<br/><span class="italic" style="color:#E23B42">bespreken?</span></h2>
+        <p class="mt-8 max-w-[560px] text-[16px] text-paper/75 leading-relaxed" data-i18n="cta.body">
+          Stuur een korte toelichting met de gegevens van het pand of bel ons rechtstreeks. Wij reageren binnen één werkdag met een eerste inschatting.
+        </p>
+      </div>
+      <div class="col-span-12 md:col-span-4 space-y-6">
+        <a href="tel:+31202600098" class="block group">
+          <div class="text-[11px] tracking-[.22em] uppercase text-paper/55" data-i18n="cta.phone">Telefoon</div>
+          <div class="font-serif text-[32px] md:text-[40px] mt-2 group-hover:text-sienna transition-colors tabular-nums">+31 20 26 000 98</div>
+        </a>
+        <a href="mailto:info@kogonderhoud.nl" class="block group">
+          <div class="text-[11px] tracking-[.22em] uppercase text-paper/55" data-i18n="cta.email">E-mail</div>
+          <div class="font-serif text-[24px] md:text-[28px] mt-2 group-hover:text-sienna transition-colors break-all">info@kogonderhoud.nl</div>
+        </a>
+        <div class="pt-2">
+          <a href="#" class="inline-flex items-center gap-2 px-6 py-4 bg-sienna text-paper hover:bg-sienna2 transition-colors text-[14px]">
+            <span data-i18n="cta.button">Vraag een offerte aan</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer class="bg-ink text-paper/70 border-t border-paper/10">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 py-12 grid grid-cols-12 gap-8">
+    <div class="col-span-12 md:col-span-4">
+      <div class="inline-flex items-center bg-paper rounded-md px-3 py-2">
+        <img src="assets/kog-logo.png" alt="KOG — Kortlevers Onderhoud Groep" class="h-11 w-auto select-none" />
+      </div>
+      <p class="mt-4 text-[13.5px] max-w-[320px] leading-relaxed" data-i18n="foot.tag">Vastgoedzorg &amp; schilderwerk in Noord-Holland. Vakkundig onderhoud — met geheugen.</p>
+    </div>
+    <div class="col-span-6 md:col-span-2">
+      <div class="eyebrow text-paper/45 mb-3" data-i18n="foot.menu">Menu</div>
+      <ul class="space-y-2 text-[13.5px]">
+        <li><a href="#geheugen"  class="hover:text-paper" data-i18n="nav.memory">Onderhoud met geheugen</a></li>
+        <li><a href="#projecten" class="hover:text-paper" data-i18n="nav.projects">Projecten</a></li>
+        <li><a href="#contact"   class="hover:text-paper" data-i18n="nav.contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="col-span-6 md:col-span-3">
+      <div class="eyebrow text-paper/45 mb-3" data-i18n="foot.contact">Contact</div>
+      <ul class="space-y-2 text-[13.5px]">
+        <li class="tabular-nums">+31 20 26 000 98</li>
+        <li><a href="mailto:info@kogonderhoud.nl" class="hover:text-paper">info@kogonderhoud.nl</a></li>
+        <li data-i18n="foot.hours">Ma–Vr · 07:30 – 17:00</li>
+        <li data-i18n="foot.area">Beverwijk · Noord-Holland</li>
+      </ul>
+    </div>
+    <div class="col-span-12 md:col-span-3">
+      <div class="eyebrow text-paper/45 mb-3" data-i18n="foot.legal">Bedrijfsinfo</div>
+      <ul class="space-y-2 text-[13.5px]">
+        <li>Kortlevers Onderhoud Groep B.V.</li>
+        <li>KvK 58125507</li>
+        <li class="flex items-center gap-3 pt-2">
+          <a href="#" aria-label="LinkedIn" class="hover:text-paper">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8 17H5.5v-7H8v7zM6.75 8.75a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM18 17h-2.5v-3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V17H10v-7h2.5v1c.5-.83 1.5-1.25 2.5-1.25 1.93 0 3 1.57 3 3.5V17z"/></svg>
+          </a>
+          <a href="#" aria-label="Instagram" class="hover:text-paper">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-paper/10">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 py-5 flex flex-wrap items-center justify-between gap-4 text-[12px] text-paper/45">
+      <span>© 2026 Kortlevers Onderhoud Groep B.V. <span data-i18n="foot.rights">Alle rechten voorbehouden.</span></span>
+      <span class="flex items-center gap-4">
+        <a href="#" class="hover:text-paper" data-i18n="foot.priv">Privacy</a>
+        <a href="#" class="hover:text-paper" data-i18n="foot.terms">Voorwaarden</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ====== QUOTE MODAL ====== -->
+<div id="quote-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="quote-modal-title">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel">
+    <button type="button" class="modal-close" aria-label="Sluiten" data-close>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+    </button>
+    <div class="p-8 md:p-10">
+      <div id="quote-form-wrap">
+        <div class="eyebrow mb-3">— <span data-i18n="quote.eyebrow">Offerte aanvragen</span></div>
+        <h2 id="quote-modal-title" class="display text-[28px] md:text-[36px] leading-tight" style="color:#CE1B24;" data-i18n="quote.title">Vertel ons over uw <span class="italic">pand.</span></h2>
+        <p class="mt-3 text-[14.5px] text-ink/70 leading-relaxed" data-i18n="quote.body">Vul de gegevens in en wij reageren binnen één werkdag met een eerste inschatting.</p>
+
+        <form id="quote-form" class="mt-7">
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="q-name" data-i18n="quote.f.name">Naam *</label>
+              <input id="q-name" name="naam" type="text" required autocomplete="name" />
+            </div>
+            <div class="form-field">
+              <label for="q-company" data-i18n="quote.f.company">Bedrijf / VvE / organisatie</label>
+              <input id="q-company" name="bedrijf" type="text" autocomplete="organization" />
+            </div>
+            <div class="form-field">
+              <label for="q-email" data-i18n="quote.f.email">E-mail *</label>
+              <input id="q-email" name="email" type="email" required autocomplete="email" />
+            </div>
+            <div class="form-field">
+              <label for="q-phone" data-i18n="quote.f.phone">Telefoon</label>
+              <input id="q-phone" name="telefoon" type="tel" autocomplete="tel" />
+            </div>
+            <div class="form-field">
+              <label for="q-audience" data-i18n="quote.f.audience">Type opdrachtgever</label>
+              <select id="q-audience" name="opdrachtgever">
+                <option value="" data-i18n="quote.f.select">Selecteer…</option>
+                <option data-i18n="aud.1">VvE's</option>
+                <option data-i18n="aud.2">Woningcorporaties</option>
+                <option data-i18n="aud.3">Vastgoedbeheerders</option>
+                <option data-i18n="aud.4">Woningeigenaren</option>
+                <option data-i18n="aud.5">Zakelijke opdrachtgevers</option>
+                <option data-i18n="aud.6">Aannemers</option>
+                <option data-i18n="aud.7">Beleggers</option>
+                <option data-i18n="aud.8">Instellingen</option>
+                <option data-i18n="quote.f.other">Anders</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="q-service" data-i18n="quote.f.service">Type werkzaamheid</label>
+              <select id="q-service" name="werkzaamheid">
+                <option value="" data-i18n="quote.f.select">Selecteer…</option>
+                <option data-i18n="svc.1.t">Schilderwerk</option>
+                <option data-i18n="svc.2.t">Bouw &amp; renovatie</option>
+                <option data-i18n="svc.3.t">Dakwerkzaamheden</option>
+                <option data-i18n="svc.4.t">Elektrotechniek</option>
+                <option data-i18n="svc.5.t">Houtrot &amp; gevelherstel</option>
+                <option data-i18n="svc.6.t">Inspectie &amp; onderhoudsadvies</option>
+                <option data-i18n="quote.f.combined">Combinatie / weet ik nog niet</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="q-ptype" data-i18n="quote.f.propertyType">Type pand</label>
+              <select id="q-ptype" name="property_type">
+                <option value="" data-i18n="quote.f.select">Selecteer…</option>
+                <option value="home" data-i18n="ptype.home">Woonhuis</option>
+                <option value="business" data-i18n="ptype.business">Bedrijfspand</option>
+                <option value="vve" data-i18n="ptype.vve">VvE-complex</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="q-timing" data-i18n="quote.f.timing">Gewenste planning</label>
+              <select id="q-timing" name="preferred_timing">
+                <option value="" data-i18n="quote.f.select">Selecteer…</option>
+                <option value="asap" data-i18n="timing.asap">Zo snel mogelijk</option>
+                <option value="1m" data-i18n="timing.1m">Binnen 1 maand</option>
+                <option value="3-6m" data-i18n="timing.3-6m">Binnen 3–6 maanden</option>
+                <option value="none" data-i18n="timing.none">Geen haast, oriënterend</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="q-location" data-i18n="quote.f.location">Locatie pand (plaats / postcode)</label>
+            <input id="q-location" name="locatie" type="text" />
+          </div>
+          <div class="form-field">
+            <label for="q-scope" data-i18n="quote.f.scope">Geschatte omvang (m², aantal panden, woningen, etc.)</label>
+            <input id="q-scope" name="omvang" type="text" />
+          </div>
+
+          <div class="form-field">
+            <label data-i18n="quote.f.components">Welk bouwdeel betreft het? (meerdere mogelijk)</label>
+            <div id="q-components" class="quote-chips">
+              <label class="quote-chip"><input type="checkbox" value="kozijnen" /><span data-i18n="comp.kozijnen">Kozijnen</span></label>
+              <label class="quote-chip"><input type="checkbox" value="gevel" /><span data-i18n="comp.gevel">Gevel</span></label>
+              <label class="quote-chip"><input type="checkbox" value="balkon" /><span data-i18n="comp.balkon">Balkon / dakterras</span></label>
+              <label class="quote-chip"><input type="checkbox" value="trappenhuis" /><span data-i18n="comp.trappenhuis">Trappenhuis</span></label>
+              <label class="quote-chip"><input type="checkbox" value="boeideel" /><span data-i18n="comp.boeideel">Boeideel</span></label>
+              <label class="quote-chip"><input type="checkbox" value="deuren" /><span data-i18n="comp.deuren">Deuren</span></label>
+              <label class="quote-chip"><input type="checkbox" value="dak" /><span data-i18n="comp.dak">Dak</span></label>
+              <label class="quote-chip"><input type="checkbox" value="overig" /><span data-i18n="comp.overig">Overig</span></label>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="q-message" data-i18n="quote.f.message">Korte toelichting</label>
+            <textarea id="q-message" name="bericht" rows="4"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="q-photos" data-i18n="quote.f.photos">Foto’s van de situatie (optioneel)</label>
+            <input id="q-photos" name="fotos" type="file" accept="image/*" multiple />
+            <p class="mt-1.5 text-[12px] text-ink/50" data-i18n="quote.f.photosHint">Maximaal 6 foto’s, elk max. 8 MB.</p>
+            <div id="q-photo-previews" class="quote-photo-previews"></div>
+          </div>
+
+          <div id="quote-error" class="hidden mt-4 p-4 rounded-lg" style="background:rgba(206,27,36,.08); border:1px solid rgba(206,27,36,.25);">
+            <p class="text-[14px] font-semibold" style="color:#A3141B;" data-i18n="quote.err.title">Er ging iets mis.</p>
+            <p class="mt-1 text-[13px] text-ink/70" data-i18n="quote.err.body">Uw aanvraag kon niet worden verstuurd. Probeert u het nogmaals, of neem rechtstreeks contact op via telefoon of e-mail.</p>
+          </div>
+
+          <div class="mt-6 flex items-center justify-between flex-wrap gap-3">
+            <span class="text-[12px] text-ink/55" data-i18n="quote.f.note">* Verplichte velden</span>
+            <button type="submit" id="quote-submit-btn" class="inline-flex items-center gap-2 px-6 py-3.5 bg-sienna text-paper hover:bg-sienna2 transition-colors text-[14px] disabled:opacity-60">
+              <span data-i18n="quote.f.submit">Verstuur aanvraag</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div id="quote-thanks" class="hidden text-center py-10">
+        <div class="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-5" style="background:rgba(95,168,60,.16); color:#4C8B30;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </div>
+        <h3 class="display text-[26px] md:text-[32px]" style="color:#CE1B24;" data-i18n="quote.thx.title">Bedankt voor uw aanvraag.</h3>
+        <p class="mt-3 text-[14.5px] text-ink/70 max-w-[420px] mx-auto" data-i18n="quote.thx.body">Wij nemen binnen één werkdag persoonlijk contact met u op.</p>
+        <div id="quote-advice" class="hidden mt-5 mx-auto max-w-[420px] text-left p-4 rounded-lg" style="background:#F1F0EA;">
+          <p class="eyebrow" data-i18n="quote.thx.adviceIntro">Alvast een indicatie:</p>
+          <p id="quote-advice-text" class="mt-1.5 text-[13.5px] text-ink/80"></p>
+        </div>
+        <button type="button" class="mt-7 inline-flex items-center gap-2 px-6 py-3 bg-ink text-paper text-[14px]" data-close>
+          <span data-i18n="quote.thx.close">Sluiten</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+/* DEMO MODE — no backend. The quote form goes through its full flow (validation,
+   photos, indicative advice) but nothing leaves the browser. */
+const kogDb = {
+  from: () => ({ insert: async () => ({ error: null }) }),
+  storage: { from: () => ({ upload: async () => ({ error: null }) }) },
+};
+</script>
+<script>
+/* ======================================================================
+   I18N — NL (default) / EN
+====================================================================== */
+const I18N = {
+  nl: {
+    'nav.services':'Diensten','nav.memory':'Onderhoud met geheugen','nav.projects':'Projecten','nav.company':'Bedrijf','nav.contact':'Contact','nav.cta':'Offerte',
+    'nav.residents':'Voor bewoners','nav.residents.callback':'Terugbelverzoek','nav.residents.project':'Project bij u in de buurt',
+    'nav.service':'Dagelijks onderhoud','nav.service.daily':'Dagelijks onderhoud','nav.service.planned':'Planmatig onderhoud','nav.service.area':'Werkzaamheden bij u in de buurt',
+    'nav.sustain':'Duurzaam wonen','nav.sustain.glass':'Energiezuinig glas','nav.sustain.roof':'Verduurzaming van uw dak',
+    'nav.sectors':'Sectoren','nav.sectors.vve':'VvE-beheer','nav.sectors.corp':'Woningcorporaties','nav.sectors.biz':'Zakelijke markt','nav.sectors.private':'Particuliere markt',
+    'nav.disciplines':'Disciplines','nav.disc.build':'Bouw & renovatie','nav.disc.paint':'Schilderwerk','nav.disc.roof':'Dakwerkzaamheden','nav.disc.elec':'Elektrotechniek',
+    'nav.aerial':'Hoogwerker-service','nav.aerial.gutter':'Gootonderhoud op hoogte','nav.aerial.inspect':'Dakinspectie & -onderhoud','nav.aerial.build':'Bouwinspecties & begeleiding',
+    'nav.contact.details':'Contactgegevens','nav.contact.jobs':'Werken bij','nav.contact.feedback':'Klacht of compliment',
+    'nav.signin':'Inloggen',
+    'hero.eyebrow':'Vastgoedzorg & schilderwerk · Noord-Holland',
+    'hero.h1b':'met geheugen.',
+    'hero.sub':'Onderhoud, herstel en verfraaiing van vastgoed, vastgelegd in een blijvend dossier zodat niets wordt vergeten, ook lang nadat de meeste aannemers zijn vertrokken. De vaste onderhoudspartner voor VvE’s, woningcorporaties en vastgoedbeheerders in Noord-Holland.',
+    'hero.ctaPrimary':'Vraag een offerte aan',
+    'trust.disc':'disciplines onder één dak','trust.contact':'vast aanspreekpunt','trust.file':'Vastgoedzorg & schilderwerk','trust.fileShort':'elk pand een dossier',
+    'trust.years':'jaar in het vak','trust.clients':'klanten geholpen',
+    'services.eyebrow':'Diensten',
+    'services.title':'Zes disciplines,<br/><span class="italic">één aanspreekpunt.</span>',
+    'services.intro':'Van planmatig onderhoud tot incidenteel herstel. Wij coördineren het volledige onderhoudsproces zodat u één partij heeft voor alles wat het pand vraagt.',
+    'svc.1.t':'Schilderwerk','svc.1.d':'Binnen- en buitenschilderwerk met duurzame verfsystemen — planmatig uitgevoerd en volledig vastgelegd in het pandsdossier.',
+    'svc.2.t':'Bouw & renovatie','svc.2.d':'Verbouw, renovatie en bouwkundig herstel door eigen vaklieden — van kozijnvervanging tot complete gevelrenovatie.',
+    'svc.3.t':'Dakwerkzaamheden','svc.3.d':'Onderhoud, herstel en vervanging van platte en hellende daken, dakgoten en dakbedekking — inclusief lekkageservice.',
+    'svc.4.t':'Elektrotechniek','svc.4.d':'Installatie, onderhoud en storingsherstel van elektrotechnische voorzieningen — veilig, gekeurd en netjes afgewerkt.',
+    'svc.5.t':'Houtrot & gevelherstel','svc.5.d':'Houtrotherstel, gevelreparatie en beglazing — structureel opgelost aan de bron, niet weggewerkt onder een laag verf.',
+    'svc.6.t':'Inspectie & onderhoudsadvies','svc.6.d':'Technische inspecties, MJOP en onderhoudsadvies — onderbouwd met de complete historie uit het pandsdossier.',
+    'mem.eyebrow':'Onderhoud met geheugen','mem.title':'Wij onthouden<br/><span class="italic" style="color:#CE1B24">uw pand.</span>','mem.badge':'Elk pand, elk bouwdeel, elke behandeling, bewaard.',
+    'mem.p1':'Een gewone schilder komt, werkt en vertrekt. Voor KOG stopt goed onderhoud niet bij oplevering: per pand en per project leggen wij vast welk bouwdeel is behandeld, met welke materialen is gewerkt, welke onderdelen aandacht nodig hebben en wanneer het volgende onderhoud aan de beurt is, compleet met foto’s vóór en ná.',
+    'mem.p2':'Zo krijgt u niet alleen vakkundig schilderwerk, maar ook inzicht in de toekomst van uw pand. Onderhoud wordt voorspelbaar in plaats van reactief: u wordt op het juiste moment benaderd, vóórdat schade ontstaat. Dat is vastgoedzorg: meedenken over de lange termijn, niet alleen een kwast hanteren.',
+    'mem.step1.t':'Vastleggen','mem.step1.d':'Elk uitgevoerd werk gedocumenteerd met materiaal en foto’s.',
+    'mem.step2.t':'Bewaren','mem.step2.d':'De volledige historie per pand blijft bewaard, jaar na jaar.',
+    'mem.step3.t':'Vooruitkijken','mem.step3.d':'De volgende inspectie wordt automatisch gepland en geadviseerd.',
+    'proj.eyebrow':'Projecten','proj.title':'Werk dat<br/><span class="italic" style="color:#CE1B24">voor zichzelf spreekt.</span>','proj.cta':'Bespreek uw project',
+    'proj.1.client':'VvE-complex · Noord-Holland','proj.1.t':'Planmatig buitenschilderwerk<br/>& houtrotherstel','proj.1.tag':'Planmatig',
+    'proj.2.tag':'Renovatie','proj.3.tag':'Totaalonderhoud',
+    'proj.1.d':'Korte projectomschrijving. Deze tekst wordt later vervangen door de projectgegevens.',
+    'proj.2.client':'Woningcorporatie','proj.2.t':'Gevelherstel & renovatie<br/>meerjarig onderhoud',
+    'proj.2.d':'Korte projectomschrijving. Deze tekst wordt later vervangen door de projectgegevens.',
+    'proj.3.client':'Particuliere woning · IJmond','proj.3.t':'Renovatie, schilderwerk & dakonderhoud met dossier',
+    'proj.3.d':'Eén partij voor het complete pand: schilderwerk, houtrotherstel en dak. Alles vastgelegd, met een advies voor het onderhoud van de komende jaren.',
+    'aud.eyebrow':'Voor wie wij werken','aud.title':'Uw vaste onderhoudspartner.',
+    'aud.body':'Wij ontzorgen partijen die hun vastgoed serieus nemen. Eén aanspreekpunt, één planning, één dossier — voor het hele pand.',
+    'aud.1':'VvE’s','aud.2':'Woningcorporaties','aud.3':'Vastgoedbeheerders','aud.4':'Woningeigenaren','aud.5':'Zakelijke opdrachtgevers','aud.6':'Aannemers','aud.7':'Beleggers','aud.8':'Instellingen',
+    'team.eyebrow':'Het bedrijf','team.title':'Vakmanschap met <span class="italic">geweten.</span>',
+    'team.p1':'Kortlevers Onderhoud Groep is een hecht vakbedrijf uit Beverwijk. Onze kracht zit in mensen die hun vak beheersen — dezelfde gezichten die uw pand jaar na jaar onderhouden en het als hun eigen werk behandelen.',
+    'team.b1.t':'Eén aanspreekpunt','team.b1.d':'Zes disciplines onder één dak — geen coördinatie tussen losse partijen, maar één partner voor het hele pand.',
+    'team.b2.t':'Een dossier per pand','team.b2.d':'Wij bewaren de complete onderhoudshistorie, zodat elke keuze onderbouwd is en niets verloren gaat.',
+    'loc.eyebrow':'Locatie & werkgebied','loc.title':'Gevestigd in Beverwijk,<br/><span class="italic" style="color:#CE1B24">actief in heel Noord-Holland.</span>',
+    'loc.1.t':'Vestiging','loc.2.t':'Werkgebied','loc.2.body':'Wij werken door heel Noord-Holland, met de IJmond en Kennemerland als thuisbasis.','loc.3.t':'Bereikbaarheid',
+    'loc.phone':'Telefoon','loc.email':'E-mail','loc.hours':'Openingstijden','loc.hoursval':'Ma–Vr · 07:30 – 17:00','loc.quote':'Vraag een offerte aan',
+    'cta.eyebrow':'Contact','cta.title':'Een project<br/><span class="italic" style="color:#E23B42">bespreken?</span>',
+    'cta.body':'Stuur een korte toelichting met de gegevens van het pand of bel ons rechtstreeks. Wij reageren binnen één werkdag met een eerste inschatting.',
+    'cta.phone':'Telefoon','cta.email':'E-mail','cta.button':'Vraag een offerte aan',
+    'foot.tag':'Vastgoedzorg & schilderwerk in Noord-Holland. Vakkundig onderhoud — met geheugen.',
+    'foot.menu':'Menu','foot.contact':'Contact','foot.hours':'Ma–Vr · 07:30 – 17:00','foot.area':'Beverwijk · Noord-Holland','foot.legal':'Bedrijfsinfo','foot.rights':'Alle rechten voorbehouden.',
+    'foot.priv':'Privacy','foot.terms':'Voorwaarden',
+    'loc.openInMaps':'Open in Google Maps',
+    'quote.eyebrow':'Offerte aanvragen',
+    'quote.title':'Vertel ons over uw <span class="italic">pand.</span>',
+    'quote.body':'Vul de gegevens in en wij reageren binnen één werkdag met een eerste inschatting.',
+    'quote.f.name':'Naam *','quote.f.company':'Bedrijf / VvE / organisatie','quote.f.email':'E-mail *','quote.f.phone':'Telefoon',
+    'quote.f.audience':'Type opdrachtgever','quote.f.service':'Type werkzaamheid',
+    'quote.f.location':'Locatie pand (plaats / postcode)','quote.f.scope':'Geschatte omvang (m², aantal panden, woningen, etc.)',
+    'quote.f.message':'Korte toelichting','quote.f.note':'* Verplichte velden','quote.f.submit':'Verstuur aanvraag',
+    'quote.f.select':'Selecteer…','quote.f.other':'Anders','quote.f.combined':'Combinatie / weet ik nog niet',
+    'quote.thx.title':'Bedankt voor uw aanvraag.',
+    'quote.thx.body':'Wij nemen binnen één werkdag persoonlijk contact met u op.',
+    'quote.thx.close':'Sluiten',
+    'quote.f.propertyType':'Type pand',
+    'ptype.home':'Woonhuis','ptype.business':'Bedrijfspand','ptype.vve':'VvE-complex',
+    'quote.f.components':'Welk bouwdeel betreft het? (meerdere mogelijk)',
+    'comp.kozijnen':'Kozijnen','comp.gevel':'Gevel','comp.balkon':'Balkon / dakterras','comp.trappenhuis':'Trappenhuis',
+    'comp.boeideel':'Boeideel','comp.deuren':'Deuren','comp.dak':'Dak','comp.overig':'Overig',
+    'quote.f.timing':'Gewenste planning',
+    'timing.asap':'Zo snel mogelijk','timing.1m':'Binnen 1 maand','timing.3-6m':'Binnen 3–6 maanden','timing.none':'Geen haast, oriënterend',
+    'quote.f.photos':'Foto’s van de situatie (optioneel)',
+    'quote.f.photosHint':'Maximaal 6 foto’s, elk max. 8 MB.',
+    'quote.f.photosRemove':'Verwijderen',
+    'quote.thx.adviceIntro':'Alvast een indicatie:',
+    'advice.kozijnen':'Kozijnwerk vraagt gemiddeld elke 6 jaar een inspectie of onderhoudsbeurt.',
+    'advice.gevel':'Gevels adviseren wij gemiddeld elke 6 jaar te laten inspecteren.',
+    'advice.balkon':'Balkons en dakterrassen adviseren wij gemiddeld elke 8 jaar te laten inspecteren.',
+    'advice.trappenhuis':'Trappenhuizen adviseren wij gemiddeld elke 8 jaar te laten inspecteren.',
+    'advice.boeideel':'Boeidelen (hout) vragen gemiddeld al na 4 jaar aandacht.',
+    'advice.deuren':'Buitendeuren adviseren wij gemiddeld elke 6 jaar te laten inspecteren.',
+    'advice.dak':'Daken adviseren wij gemiddeld elke 10 jaar te laten inspecteren.',
+    'advice.overig':'Wij adviseren dit onderdeel gemiddeld elke 5 jaar te laten inspecteren.',
+    'quote.err.title':'Er ging iets mis.',
+    'quote.err.body':'Uw aanvraag kon niet worden verstuurd. Probeert u het nogmaals, of neem rechtstreeks contact op via telefoon of e-mail.',
+    'quote.err.retry':'Opnieuw proberen',
+  },
+  en: {
+    'nav.services':'Services','nav.memory':'Maintenance with memory','nav.projects':'Projects','nav.company':'Company','nav.contact':'Contact','nav.cta':'Quote',
+    'nav.residents':'For Residents','nav.residents.callback':'Call-back Request','nav.residents.project':'Project Near You',
+    'nav.service':'Daily Maintenance','nav.service.daily':'Daily Maintenance','nav.service.planned':'Planned Maintenance','nav.service.area':'Work in Your Area',
+    'nav.sustain':'Sustainable Living','nav.sustain.glass':'Energy-efficient Glazing','nav.sustain.roof':'Roof Sustainability',
+    'nav.sectors':'Sectors','nav.sectors.vve':'HOAs / Management','nav.sectors.corp':'Housing Associations','nav.sectors.biz':'Business Market','nav.sectors.private':'Private Market',
+    'nav.disciplines':'Disciplines','nav.disc.build':'Construction & Renovation','nav.disc.paint':'Painting','nav.disc.roof':'Roofing','nav.disc.elec':'Electrical',
+    'nav.aerial':'Aerial Platform','nav.aerial.gutter':'Gutter Cleaning at Height','nav.aerial.inspect':'Roof Inspection & Maintenance','nav.aerial.build':'Building Inspections & Supervision',
+    'nav.contact.details':'Contact Details','nav.contact.jobs':'Careers','nav.contact.feedback':'Complaint or Compliment',
+    'nav.signin':'Sign in',
+    'hero.eyebrow':'Property care & painting · North Holland',
+    'hero.h1b':'with memory.',
+    'hero.sub':'Maintaining, repairing and enhancing real estate, tracked in a lasting file so nothing is forgotten long after most contractors have moved on. The long-term maintenance partner for HOAs, corporations and property managers in North Holland.',
+    'hero.ctaPrimary':'Request a quote',
+    'trust.disc':'disciplines under one roof','trust.contact':'single point of contact','trust.file':'Property care & painting','trust.fileShort':'a file per property',
+    'trust.years':'years in business','trust.clients':'clients served',
+    'services.eyebrow':'Services',
+    'services.title':'Six disciplines,<br/><span class="italic">one point of contact.</span>',
+    'services.intro':'From planned maintenance to incidental repairs. We coordinate the full maintenance process so you have a single partner for everything the property needs.',
+    'svc.1.t':'Painting','svc.1.d':'Interior and exterior painting with durable coating systems — planned, executed and fully recorded in the property file.',
+    'svc.2.t':'Construction & renovation','svc.2.d':'Conversion, renovation and structural repair by our own craftsmen — from window-frame replacement to full façade renovation.',
+    'svc.3.t':'Roofing','svc.3.d':'Maintenance, repair and replacement of flat and pitched roofs, gutters and roofing — including leak service.',
+    'svc.4.t':'Electrical engineering','svc.4.d':'Installation, maintenance and fault repair of electrical systems — safe, certified and neatly finished.',
+    'svc.5.t':'Wood rot & façade repair','svc.5.d':'Wood rot repair, façade repair and glazing — solved structurally at the source, not hidden under a coat of paint.',
+    'svc.6.t':'Inspection & maintenance advice','svc.6.d':'Technical inspections, long-term maintenance plans (MJOP) and advice — grounded in the property file’s full history.',
+    'mem.eyebrow':'Maintenance with memory','mem.title':'We remember<br/><span class="italic" style="color:#CE1B24">your property.</span>','mem.badge':'Every property, every component, every treatment, kept.',
+    'mem.p1':'An ordinary painter comes, works and leaves. For KOG, good maintenance doesn’t stop at completion: for every property and every project we record which component was treated, with which materials, which parts need attention, and when the next maintenance is due, complete with before-and-after photos.',
+    'mem.p2':'That gives you more than clean painting work: insight into your property’s future. Maintenance becomes predictable instead of reactive, and you are contacted at the right moment, before damage occurs. That is property care: thinking with you for the long term, not just wielding a brush.',
+    'mem.step1.t':'Record','mem.step1.d':'Every job documented with materials and photos.',
+    'mem.step2.t':'Keep','mem.step2.d':'The full history per property is kept, year after year.',
+    'mem.step3.t':'Look ahead','mem.step3.d':'The next inspection is planned and advised automatically.',
+    'proj.eyebrow':'Projects','proj.title':'Work that<br/><span class="italic" style="color:#CE1B24">speaks for itself.</span>','proj.cta':'Discuss your project',
+    'proj.1.client':'HOA complex · North Holland','proj.1.t':'Planned exterior painting<br/>& wood rot repair','proj.1.tag':'Planned',
+    'proj.2.tag':'Renovation','proj.3.tag':'Total maintenance',
+    'proj.1.d':'Short project description. This placeholder text will be replaced with the project details later.',
+    'proj.2.client':'Housing corporation','proj.2.t':'Façade repair & renovation<br/>multi-year maintenance',
+    'proj.2.d':'Short project description. This placeholder text will be replaced with the project details later.',
+    'proj.3.client':'Private home · IJmond','proj.3.t':'Renovation, painting & roof maintenance with a file',
+    'proj.3.d':'A single partner for the whole property: painting, wood rot repair and roofing. All recorded, with advice for the maintenance of the years ahead.',
+    'aud.eyebrow':'Who we work for','aud.title':'Your long-term maintenance partner.',
+    'aud.body':'We take care of organisations that take their real estate seriously. One contact, one plan, one file — for the whole property.',
+    'aud.1':'HOAs','aud.2':'Housing corporations','aud.3':'Property managers','aud.4':'Homeowners','aud.5':'Commercial clients','aud.6':'Contractors','aud.7':'Investors','aud.8':'Institutions',
+    'team.eyebrow':'The company','team.title':'Craftsmanship with <span class="italic">conscience.</span>',
+    'team.p1':'Kortlevers Onderhoud Groep is a close-knit specialist firm from Beverwijk. Our strength is people who master their craft — the same faces maintaining your property year after year and treating it as their own work.',
+    'team.b1.t':'One point of contact','team.b1.d':'Six disciplines under one roof — no coordinating separate parties, just one partner for the whole property.',
+    'team.b2.t':'A file per property','team.b2.d':'We keep the complete maintenance history, so every choice is grounded and nothing is lost.',
+    'loc.eyebrow':'Location & service area','loc.title':'Based in Beverwijk,<br/><span class="italic" style="color:#CE1B24">active across North Holland.</span>',
+    'loc.1.t':'Office','loc.2.t':'Service area','loc.2.body':'We work throughout North Holland, with the IJmond and Kennemerland regions as our home base.','loc.3.t':'Get in touch',
+    'loc.phone':'Phone','loc.email':'Email','loc.hours':'Opening hours','loc.hoursval':'Mon–Fri · 07:30 – 17:00','loc.quote':'Request a quote',
+    'cta.eyebrow':'Contact','cta.title':'Discussing a<br/><span class="italic" style="color:#E23B42">project?</span>',
+    'cta.body':'Send a short brief with the property details or call us directly. We respond within one working day with a first assessment.',
+    'cta.phone':'Phone','cta.email':'Email','cta.button':'Request a quote',
+    'foot.tag':'Property care & painting in North Holland. Expert maintenance — with memory.',
+    'foot.menu':'Menu','foot.contact':'Contact','foot.hours':'Mon–Fri · 07:30 – 17:00','foot.area':'Beverwijk · North Holland','foot.legal':'Company info','foot.rights':'All rights reserved.',
+    'foot.priv':'Privacy','foot.terms':'Terms',
+    'loc.openInMaps':'Open in Google Maps',
+    'quote.eyebrow':'Request a quote',
+    'quote.title':'Tell us about your <span class="italic">property.</span>',
+    'quote.body':'Fill in the details and we will respond within one working day with a first assessment.',
+    'quote.f.name':'Name *','quote.f.company':'Company / HOA / organisation','quote.f.email':'Email *','quote.f.phone':'Phone',
+    'quote.f.audience':'Client type','quote.f.service':'Type of work',
+    'quote.f.location':'Property location (city / postcode)','quote.f.scope':'Estimated scope (m², number of properties, units, etc.)',
+    'quote.f.message':'Short brief','quote.f.note':'* Required fields','quote.f.submit':'Send request',
+    'quote.f.select':'Select…','quote.f.other':'Other','quote.f.combined':'Combination / not sure yet',
+    'quote.thx.title':'Thank you for your request.',
+    'quote.thx.body':'We will contact you personally within one working day.',
+    'quote.thx.close':'Close',
+    'quote.f.propertyType':'Property type',
+    'ptype.home':'Home','ptype.business':'Business premises','ptype.vve':'HOA complex',
+    'quote.f.components':'Which building component(s)? (multiple possible)',
+    'comp.kozijnen':'Window frames','comp.gevel':'Façade','comp.balkon':'Balcony / roof terrace','comp.trappenhuis':'Stairwell',
+    'comp.boeideel':'Fascia board','comp.deuren':'Doors','comp.dak':'Roof','comp.overig':'Other',
+    'quote.f.timing':'Preferred timing',
+    'timing.asap':'As soon as possible','timing.1m':'Within 1 month','timing.3-6m':'Within 3–6 months','timing.none':'No rush, exploring options',
+    'quote.f.photos':'Photos of the situation (optional)',
+    'quote.f.photosHint':'Maximum 6 photos, 8 MB each.',
+    'quote.f.photosRemove':'Remove',
+    'quote.thx.adviceIntro':'An initial indication:',
+    'advice.kozijnen':'Window frames typically need an inspection or maintenance every 6 years.',
+    'advice.gevel':'We advise having façades inspected roughly every 6 years.',
+    'advice.balkon':'We advise having balconies and roof terraces inspected roughly every 8 years.',
+    'advice.trappenhuis':'We advise having stairwells inspected roughly every 8 years.',
+    'advice.boeideel':'Fascia boards (wood) often need attention after as little as 4 years.',
+    'advice.deuren':'We advise having exterior doors inspected roughly every 6 years.',
+    'advice.dak':'We advise having roofs inspected roughly every 10 years.',
+    'advice.overig':'We advise having this component inspected roughly every 5 years.',
+    'quote.err.title':'Something went wrong.',
+    'quote.err.body':'Your request could not be sent. Please try again, or contact us directly by phone or email.',
+    'quote.err.retry':'Try again',
+  }
+};
+
+const FLAGS = {
+  nl: '<svg viewBox="0 0 60 45"><rect width="60" height="45" fill="#fff"/><rect width="60" height="15" fill="#AE1C28"/><rect y="30" width="60" height="15" fill="#21468B"/></svg>',
+  en: '<svg viewBox="0 0 60 45"><clipPath id="gbAt"><path d="M0,0 v45 h60 v-45 z"/></clipPath><clipPath id="gbBt"><path d="M30,22.5 h30 v22.5 z v22.5 h-30 z h-30 v-22.5 z v-22.5 h30 z"/></clipPath><g clip-path="url(#gbAt)"><path d="M0,0 v45 h60 v-45 z" fill="#012169"/><path d="M0,0 L60,45 M60,0 L0,45" stroke="#fff" stroke-width="9"/><path d="M0,0 L60,45 M60,0 L0,45" clip-path="url(#gbBt)" stroke="#C8102E" stroke-width="6"/><path d="M30,0 v45 M0,22.5 h60" stroke="#fff" stroke-width="15"/><path d="M30,0 v45 M0,22.5 h60" stroke="#C8102E" stroke-width="9"/></g></svg>'
+};
+
+function setLang(lang) {
+  const dict = I18N[lang] || I18N.nl;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    const v = dict[k];
+    if (v != null && typeof v === 'string') el.innerHTML = v;
+  });
+  const flag = document.getElementById('lang-flag');
+  const code = document.getElementById('lang-code');
+  if (flag) flag.innerHTML = FLAGS[lang] || FLAGS.nl;
+  if (code) code.textContent = lang.toUpperCase();
+  document.querySelectorAll('.kog-lang__item').forEach(it => it.setAttribute('aria-selected', String(it.dataset.lang === lang)));
+  updateHeroWord(false);
+}
+
+/* Hero headline word — one per slide, cycling through KOG's other trades */
+const HERO_WORDS = {
+  nl: ['Schilderwerk','Dakwerk','Renovatie','Afwerking','Hoogwerkerservice','Onderhoud'],
+  en: ['Painting work','Roofing work','Renovation','Finishing','Aerial service','Maintenance'],
+};
+function updateHeroWord(animate) {
+  const el = document.getElementById('hero-word');
+  const slides = document.querySelectorAll('#hero-slides .hero-slide');
+  if (!el || !slides.length) return;
+  const slideIdx = Math.max(0, Array.from(slides).findIndex(s => s.classList.contains('active')));
+  const lang = document.documentElement.lang === 'en' ? 'en' : 'nl';
+  const words = HERO_WORDS[lang];
+  const word = words[slideIdx % words.length];
+  if (animate) {
+    el.classList.add('swap');
+    setTimeout(() => { el.textContent = word; el.classList.remove('swap'); }, 350);
+  } else {
+    el.textContent = word;
+  }
+}
+
+/* Language flag dropdown */
+const kogLang = document.getElementById('kog-lang');
+if (kogLang) {
+  const trigger = kogLang.querySelector('.kog-lang__trigger');
+  const closeLang = () => { kogLang.classList.remove('open'); trigger.setAttribute('aria-expanded', 'false'); };
+  trigger.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = kogLang.classList.toggle('open');
+    trigger.setAttribute('aria-expanded', String(open));
+  });
+  kogLang.querySelectorAll('.kog-lang__item').forEach(it => {
+    it.addEventListener('click', () => { setLang(it.dataset.lang); closeLang(); });
+  });
+  document.addEventListener('click', e => { if (!kogLang.contains(e.target)) closeLang(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLang(); });
+}
+
+/* ======================================================================
+   Reveal on scroll
+====================================================================== */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ======================================================================
+   Project stack — depth effect while pinned
+   The stacking itself is pure CSS (position: sticky). This only adds
+   polish: as the next card flies up, the covered card recedes and dims
+   proportionally to scroll.
+====================================================================== */
+(function projectStack() {
+  const wraps = Array.from(document.querySelectorAll('#pstack .pcard-wrap'));
+  if (wraps.length < 2) return;
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return; // sticky stacking still works; skip the motion polish
+  let ticking = false;
+  function update() {
+    ticking = false;
+    for (let i = 0; i < wraps.length - 1; i++) {
+      const card = wraps[i].firstElementChild;
+      const rect = wraps[i].getBoundingClientRect();
+      const nextTop = wraps[i + 1].getBoundingClientRect().top;
+      // p: 0 = next card still below this one, 1 = fully covering it
+      const p = Math.min(1, Math.max(0, 1 - (nextTop - rect.top) / rect.height));
+      card.style.transform = 'scale(' + (1 - 0.05 * p).toFixed(4) + ')';
+      card.style.filter = 'brightness(' + (1 - 0.28 * p).toFixed(4) + ')';
+    }
+  }
+  function onScroll() {
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
+})();
+
+/* ======================================================================
+   Hero — cross-fading slideshow (same switching hero as the KOG site)
+====================================================================== */
+(function heroSlideshow() {
+  const slides = Array.from(document.querySelectorAll('#hero-slides .hero-slide'));
+  if (slides.length < 2) return;
+  let i = 0;
+  const HOLD = 5000; // ms each slide is shown
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return; // keep the first slide static
+  setInterval(() => {
+    slides[i].classList.remove('active');
+    i = (i + 1) % slides.length;
+    slides[i].classList.add('active');
+    updateHeroWord(true);
+  }, HOLD);
+})();
+
+/* "Onderhoud met geheugen" — single image block that keeps switching */
+(function memSlideshow() {
+  const slides = Array.from(document.querySelectorAll('#mem-slides .mem-slide'));
+  if (slides.length < 2) return;
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+  let i = 0;
+  setInterval(() => {
+    slides[i].classList.remove('active');
+    i = (i + 1) % slides.length;
+    slides[i].classList.add('active');
+  }, 4500);
+})();
+
+/* ======================================================================
+   Mobile nav (burger)
+====================================================================== */
+const burger = document.getElementById('burger');
+if (burger) {
+  const toggleMnav = (open) => {
+    const isOpen = open !== undefined ? open : !document.body.classList.contains('mnav-open');
+    document.body.classList.toggle('mnav-open', isOpen);
+    burger.setAttribute('aria-expanded', String(isOpen));
+  };
+  burger.addEventListener('click', () => toggleMnav());
+  document.querySelectorAll('[data-close-mnav]').forEach(a => a.addEventListener('click', () => toggleMnav(false)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleMnav(false); });
+}
+
+/* ======================================================================
+   Modals — quote form
+====================================================================== */
+function openModal(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.add('open');
+  document.body.classList.add('modal-open');
+  const focusable = m.querySelector('input, select, textarea, button');
+  if (focusable) setTimeout(() => focusable.focus(), 80);
+}
+function closeModal(m) {
+  m.classList.remove('open');
+  if (!document.querySelector('.modal.open')) document.body.classList.remove('modal-open');
+}
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target.hasAttribute('data-close') || e.target.closest('[data-close]')) closeModal(m);
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal.open').forEach(closeModal);
+});
+
+/* Quote triggers: nav button, hero CTA, contact CTA */
+document.querySelectorAll('[data-i18n="nav.cta"], [data-i18n="hero.ctaPrimary"], [data-i18n="cta.button"], [data-i18n="loc.quote"]').forEach(el => {
+  const trigger = el.closest('a, button') || el;
+  trigger.addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('quote-form-wrap').classList.remove('hidden');
+    document.getElementById('quote-thanks').classList.add('hidden');
+    openModal('quote-modal');
+  });
+});
+
+/* Indicative maintenance advice — simple rule table, no AI. Keep in sync with admin/js/intervals.js */
+const KOG_INTERVALS = {
+  kozijnen: 6, gevel: 6, balkon: 8, trappenhuis: 8, boeideel: 4, deuren: 6, dak: 10, overig: 5,
+};
+function mostUrgentComponent(componentTypes) {
+  if (!componentTypes.length) return null;
+  return componentTypes.reduce((a, b) => (KOG_INTERVALS[b] < KOG_INTERVALS[a] ? b : a));
+}
+
+/* Photo upload — thumbnail previews + client-side cap (mirrors the quote-photos bucket limit) */
+const MAX_PHOTOS = 6, MAX_PHOTO_BYTES = 8 * 1024 * 1024;
+let quotePhotoFiles = [];
+const photoInput = document.getElementById('q-photos');
+const photoPreviews = document.getElementById('q-photo-previews');
+function renderPhotoPreviews() {
+  photoPreviews.innerHTML = '';
+  quotePhotoFiles.forEach((file, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'quote-photo-thumb';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.textContent = '✕';
+    removeBtn.setAttribute('aria-label', I18N[document.documentElement.lang === 'en' ? 'en' : 'nl']['quote.f.photosRemove'] || 'Remove');
+    removeBtn.addEventListener('click', () => { quotePhotoFiles.splice(i, 1); renderPhotoPreviews(); });
+    thumb.append(img, removeBtn);
+    photoPreviews.appendChild(thumb);
+  });
+}
+if (photoInput) {
+  photoInput.addEventListener('change', () => {
+    const incoming = Array.from(photoInput.files || [])
+      .filter(f => f.size <= MAX_PHOTO_BYTES)
+      .slice(0, MAX_PHOTOS - quotePhotoFiles.length);
+    quotePhotoFiles = quotePhotoFiles.concat(incoming).slice(0, MAX_PHOTOS);
+    photoInput.value = '';
+    renderPhotoPreviews();
+  });
+}
+
+/* Quote form submit — persists to Supabase (quote_requests + quote_photos + storage) */
+const quoteForm = document.getElementById('quote-form');
+if (quoteForm) {
+  quoteForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const lang = document.documentElement.lang === 'en' ? 'en' : 'nl';
+    const dict = I18N[lang];
+    const submitBtn = document.getElementById('quote-submit-btn');
+    const errorBox = document.getElementById('quote-error');
+    errorBox.classList.add('hidden');
+    submitBtn.disabled = true;
+
+    const data = new FormData(quoteForm);
+    const componentTypes = Array.from(document.querySelectorAll('#q-components input:checked')).map(i => i.value);
+    const quoteId = crypto.randomUUID();
+
+    try {
+      const { error: insertError } = await kogDb.from('quote_requests').insert({
+        id: quoteId,
+        name: data.get('naam'),
+        company: data.get('bedrijf') || null,
+        email: data.get('email'),
+        phone: data.get('telefoon') || null,
+        requester_type: data.get('opdrachtgever') || null,
+        property_type: data.get('property_type') || null,
+        component_types: componentTypes,
+        work_type: data.get('werkzaamheid') || null,
+        location: data.get('locatie') || null,
+        scope: data.get('omvang') || null,
+        preferred_timing: data.get('preferred_timing') || null,
+        message: data.get('bericht') || null,
+      });
+      if (insertError) throw insertError;
+
+      for (const file of quotePhotoFiles) {
+        const path = `${quoteId}/${crypto.randomUUID()}-${file.name}`;
+        const { error: uploadError } = await kogDb.storage.from('quote-photos').upload(path, file);
+        if (uploadError) throw uploadError;
+        const { error: photoRowError } = await kogDb.from('quote_photos').insert({
+          id: crypto.randomUUID(), quote_id: quoteId, storage_path: path,
+        });
+        if (photoRowError) throw photoRowError;
+      }
+
+      const urgent = mostUrgentComponent(componentTypes);
+      const adviceBox = document.getElementById('quote-advice');
+      if (urgent) {
+        document.getElementById('quote-advice-text').textContent = dict['advice.' + urgent] || '';
+        adviceBox.classList.remove('hidden');
+      } else {
+        adviceBox.classList.add('hidden');
+      }
+
+      document.getElementById('quote-form-wrap').classList.add('hidden');
+      document.getElementById('quote-thanks').classList.remove('hidden');
+      quoteForm.reset();
+      quotePhotoFiles = [];
+      renderPhotoPreviews();
+    } catch (err) {
+      console.error('Quote submit failed:', err);
+      errorBox.classList.remove('hidden');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+}
+</script>
+<script src="demo-ribbon.js"></script>
+</body>
+</html>
