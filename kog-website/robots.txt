@@ -1,0 +1,5 @@
+# Demo deployment — keep search engines out until the real launch.
+# At launch: change this to allow crawling of the marketing site
+# (keep /admin/ and /mijn-pand/ disallowed).
+User-agent: *
+Disallow: /

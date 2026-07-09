@@ -6,7 +6,7 @@
 <title>KOG — Kortlevers Onderhoud Groep · Schilderwerk met geheugen.</title>
 <meta name="description" content="Kortlevers Onderhoud Groep (KOG) — vastgoedzorg & schilderwerk in Noord-Holland. De onderhoudspartner voor VvE's, woningcorporaties en vastgoedbeheerders. Schilderwerk met geheugen." />
 
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="assets/vendor/tailwind-play.js"></script>
 <style>
   /* Montserrat — self-hosted (same font files as kogonderhoud.nl) */
   @font-face { font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap; src:url('assets/fonts/montserrat-400.ttf') format('truetype'); }
@@ -1046,7 +1046,7 @@
 
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/vendor/supabase.min.js"></script>
 <script>
 /* Supabase — public anon key, safe to expose client-side (RLS restricts it to insert-only) */
 const kogDb = window.supabase.createClient(

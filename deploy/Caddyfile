@@ -1,0 +1,25 @@
+# KOG demo deployment — Caddy site config.
+# {$DOMAIN} is substituted by setup-vps.sh; Caddy provisions Let's Encrypt
+# certificates for it automatically (needs DNS A record -> this VPS, port 80+443 open).
+{$DOMAIN} {
+	root * /var/www/kog
+	encode zstd gzip
+	file_server
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Images, fonts and pinned vendor scripts can be cached for a week.
+	@static path /assets/*
+	header @static Cache-Control "public, max-age=604800"
+
+	# HTML and app JS have no content hashes — always revalidate so a redeploy
+	# is picked up immediately.
+	@app path *.html *.js /
+	header @app Cache-Control "no-cache"
+}
