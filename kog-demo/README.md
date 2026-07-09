@@ -1,9 +1,13 @@
 # KOG Onderhoudssysteem — Demo
 
+> ⚠️ **Dit is niet het echte systeem.** Dit pakket is een *demonstratieversie*:
+> een makkelijke manier om de applicatie te bekijken en aan anderen te laten
+> zien. Alle panden, namen en aanvragen zijn **fictief**, er is geen verbinding
+> met echte data of klanten, en alles draait uitsluitend op uw eigen computer.
+
 **"Schilderwerk met geheugen"** — dit pakket laat het complete KOG-systeem zien
 zoals het nu werkt: de website, het klantportaal en de beheeromgeving voor
-medewerkers. Alles draait lokaal op uw eigen computer, met fictieve
-voorbeelddata. **Geen installatie, geen account, geen internet nodig.**
+medewerkers. **Geen installatie, geen account, geen internet nodig.**
 
 ---
 
@@ -12,6 +16,10 @@ voorbeelddata. **Geen installatie, geen account, geen internet nodig.**
 **Windows** — dubbelklik op **`START-DEMO.bat`**. Uw browser opent vanzelf.
 
 **Mac / Linux** — open een terminal in deze map en voer uit: `bash start-demo.sh`
+
+**Met een AI-assistent** — gebruikt u Claude, ChatGPT/Codex of Copilot? Geef de
+tool deze map en vraag *"start deze demo"* — onderaan dit bestand staan
+instructies die AI-assistenten direct herkennen en uitvoeren.
 
 Lukt dat niet? Zie [Alternatieven](#alternatieven) onderaan.
 
